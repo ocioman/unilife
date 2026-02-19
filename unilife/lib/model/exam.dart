@@ -4,13 +4,15 @@ part 'exam.g.dart';
 
 @JsonSerializable()
 class Exam{
-  final int examID;
+  final int examID; //pk
+  final int userID; //fk
   DateTime due;
   String courseName;
   Priority priority;
 
-  Exam({
+  Exam({ //parentesi graffe -> named parameters
     required this.examID, //facendo required this... rendo il parametro mandatory e lo assegno automaticamente all'attributo
+    required this.userID,
     required this.due,
     required this.courseName,
     required this.priority
