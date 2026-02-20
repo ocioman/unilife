@@ -5,7 +5,7 @@ part 'grade.g.dart';
 @JsonSerializable()
 class Grade{
   final int gradeID; //pk
-  final int userID; //fk
+  final String userID; //fk
   String examName;
   double? value;
   final bool isPartial;

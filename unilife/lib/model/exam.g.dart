@@ -8,7 +8,7 @@ part of 'exam.dart';
 
 Exam _$ExamFromJson(Map<String, dynamic> json) => Exam(
   examID: (json['examID'] as num).toInt(),
-  userID: (json['userID'] as num).toInt(),
+  userID: json['userID'] as String,
   due: DateTime.parse(json['due'] as String),
   courseName: json['courseName'] as String,
   priority: $enumDecode(_$PriorityEnumMap, json['priority']),

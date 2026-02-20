@@ -8,7 +8,7 @@ part of 'grade.dart';
 
 Grade _$GradeFromJson(Map<String, dynamic> json) => Grade(
   gradeID: (json['gradeID'] as num).toInt(),
-  userID: (json['userID'] as num).toInt(),
+  userID: json['userID'] as String,
   examName: json['examName'] as String,
   value: (json['value'] as num?)?.toDouble(),
   isPartial: json['isPartial'] as bool,

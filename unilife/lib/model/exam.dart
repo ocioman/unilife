@@ -5,7 +5,7 @@ part 'exam.g.dart';
 @JsonSerializable()
 class Exam{
   final int examID; //pk
-  final int userID; //fk
+  final String userID; //fk
   DateTime due;
   String courseName;
   Priority priority;

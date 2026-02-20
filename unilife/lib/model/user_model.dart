@@ -3,11 +3,11 @@ import 'package:unilife/model/grade.dart';
 
 import 'exam.dart';
 
-part 'user.g.dart';
+part 'user_model.g.dart';
 
 @JsonSerializable()
-class User{
-  final int userID;
+class UserModel{
+  final String userID;
   String name1;
   String? name2;
   String surname1;
@@ -17,7 +17,7 @@ class User{
   List<Grade>? grades;
   List<Exam>? exams;
 
-  User({
+  UserModel({
     required this.userID,
     required this.name1,
     this.name2,
@@ -29,7 +29,7 @@ class User{
     this.exams,
   });
 
-  factory User.fromJson(Map<String, dynamic> json)=>_$UserFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json)=>_$UserModelFromJson(json);
 
-  Map<String, dynamic> toJson()=>_$UserToJson(this);
+  Map<String, dynamic> toJson()=>_$UserModelToJson(this);
 }
