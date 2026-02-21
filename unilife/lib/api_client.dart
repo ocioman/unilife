@@ -122,14 +122,14 @@ class ApiClient{
     }
   }
 
-  Future<Grade> addGrade({required String examName, double? value, required bool isPartial, int? parentGradeID, bool? isCompleted, required int weigth}) async{
+  Future<Grade> addGrade({required String examName, double? value, required bool isPartial, int? parentGradeID, bool? isCompleted, required int weight}) async{
     try{
 
         List<dynamic> resJson=await _supabase
             .from('grades')
             .insert({'examName': examName, 'value':(value==null)?'null':value.toString(), 'isPartial':isPartial.toString(),
                     'parentGradeID':(parentGradeID==null)?'null':parentGradeID.toString(), 'isCompleted':(isCompleted==null)?'null':isCompleted.toString(),
-                    'weigth': weigth.toString()})
+                    'weight': weight.toString()})
             .select();
 
 

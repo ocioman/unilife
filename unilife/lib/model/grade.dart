@@ -11,7 +11,7 @@ class Grade{
   final bool isPartial;
   int? parentGradeID;
   bool? isCompleted;
-  int weigth;
+  int weight;
 
   /*
   Con parentGradeID realizzo una relazione ricorsiva -> creo una vista contenente solo i voti con isCompleted e isPartial
@@ -27,7 +27,7 @@ class Grade{
     required this.isPartial,
     this.parentGradeID,
     this.isCompleted,
-    required this.weigth,
+    required this.weight,
   });
 
   factory Grade.fromJson(Map<String, dynamic> json)=>_$GradeFromJson(json);
