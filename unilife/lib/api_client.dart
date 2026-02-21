@@ -64,13 +64,21 @@ class ApiClient{
 
   Future<List<Exam>> fetchExams() async{
     try{
-        List<dynamic> resJson=await _supabase
+        List<Exam> exams=[];
+
+        List<dynamic> resJson=await _supabase //tecnicamente ritorna una lista di Map<String, dynamic>
+        //ma è meglio usare dynamic perché supabase usa PostgrestList
             .from('exams')
             .select()
             .eq('userID', currUuid);
 
-        return resJson.map((examJson)=>Exam.fromJson(examJson)).toList();
-    }on AuthException{
+        for(var v in resJson){
+           exams.add(Exam.fromJson(v as Map<String, dynamic>));
+        }
+
+        return exams;
+
+    }on PostgrestException{
       rethrow;
     }catch(e){
       rethrow;
@@ -79,13 +87,54 @@ class ApiClient{
 
   Future<List<Grade>> fetchGrades() async{
     try{
-      List<dynamic> resJson=await _supabase
-          .from('grades')
-          .select()
-          .eq('userID', currUuid);
+        List<Grade> grades=[];
 
-      return resJson.map((gradesJson)=>Grade.fromJson(gradesJson)).toList();
-    }on AuthException{
+        List<dynamic> resJson=await _supabase
+            .from('grades')
+            .select()
+            .eq('userID', currUuid);
+
+        for(var v in resJson){
+          grades.add(Grade.fromJson(v as Map<String, dynamic>));
+        }
+
+        return grades;
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<Exam> addExam({required DateTime due, required String courseName, required Priority priority}) async{
+    try{
+
+        List<dynamic> resJson=await _supabase
+        .from('exams')
+        .insert({'userID': currUuid, 'due': due.toIso8601String(), 'courseName': courseName, 'priority': priority.name})
+        .select();
+
+        return Exam.fromJson(resJson.first as Map<String, dynamic>);
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<Grade> addGrade({required String examName, double? value, required bool isPartial, int? parentGradeID, bool? isCompleted, required int weigth}) async{
+    try{
+
+        List<dynamic> resJson=await _supabase
+            .from('grades')
+            .insert({'examName': examName, 'value':(value==null)?'null':value.toString(), 'isPartial':isPartial.toString(),
+                    'parentGradeID':(parentGradeID==null)?'null':parentGradeID.toString(), 'isCompleted':(isCompleted==null)?'null':isCompleted.toString(),
+                    'weigth': weigth.toString()})
+            .select();
+
+
+            return Grade.fromJson(resJson.first as Map<String, dynamic>);
+    }on PostgrestException{
       rethrow;
     }catch(e){
       rethrow;
