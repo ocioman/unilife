@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:unilife/model/user_model.dart';
 
 
 import 'model/exam.dart';
@@ -34,16 +35,19 @@ class ApiClient{
     }
   }
 
-  Future<void> signIn({required String email, required String password}) async{
-    AuthResponse res;
+  Future<UserModel> signIn({required String email, required String password}) async{
     try{
-      res=await _supabase.auth.signInWithPassword(
+      await _supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
+      
+      List<dynamic> resJson=await _supabase
+      .from('users')
+      .select()
+      .eq('userID', _uid);
 
-      User? user=res.user;
-      if(user==null) throw Exception("Login fallito: utente nullo"); //teoricamente non dovrebbe succedere perché catturo già l'eccezione di supabase
+      return UserModel.fromJson(resJson.first as Map<String, dynamic>);
     }on AuthException{
       rethrow;
     }catch(e){
