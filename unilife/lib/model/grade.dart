@@ -11,12 +11,15 @@ class Grade{
   final bool isPartial;
   int? parentGradeID;
   bool? isCompleted;
-  int weight;
+  int? weight; //per gli esami parziali
+  int? cfu;  //per gli esami completi
 
   /*
-  Con parentGradeID realizzo una relazione ricorsiva -> creo una vista contenente solo i voti con isCompleted e isPartial
-  =true e poi creo una vista con funzione di aggregazione avg per i vari esami parziali -> faccio un join e ottengo solo
-  le medie degli esami di cui sono stati svolti tutti i parziali
+  Con parentGradeID realizzo una relazione ricorsiva
+  Creo una vista con gli id e i cfu degli esami padre completi (quindi isPartial=true, isCompleted=true, e parentGradeID=null),
+  creo una vista con gli esami parziali (isPartial=true e parentGradeID=valore)
+  selezionando solo il voto e il peso ed eseguo il join tra le due viste
+
    */
 
   Grade({

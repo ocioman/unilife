@@ -14,8 +14,8 @@ Grade _$GradeFromJson(Map<String, dynamic> json) => Grade(
   isPartial: json['isPartial'] as bool,
   parentGradeID: (json['parentGradeID'] as num?)?.toInt(),
   isCompleted: json['isCompleted'] as bool?,
-  weight: (json['weight'] as num).toInt(),
-);
+  weight: (json['weight'] as num?)?.toInt(),
+)..cfu = (json['cfu'] as num?)?.toInt();
 
 Map<String, dynamic> _$GradeToJson(Grade instance) => <String, dynamic>{
   'gradeID': instance.gradeID,
@@ -26,4 +26,5 @@ Map<String, dynamic> _$GradeToJson(Grade instance) => <String, dynamic>{
   'parentGradeID': instance.parentGradeID,
   'isCompleted': instance.isCompleted,
   'weight': instance.weight,
+  'cfu': instance.cfu,
 };
