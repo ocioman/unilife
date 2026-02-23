@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:unilife/model/user_model.dart';
+
 
 import 'model/exam.dart';
 import 'model/grade.dart';
@@ -8,7 +8,10 @@ import 'model/grade.dart';
 //TODO: sicurezza password e correttezza email
 
 class ApiClient{
-  final SupabaseClient _supabase=Supabase.instance.client;
+  final SupabaseClient _supabase;
+
+  ApiClient({required SupabaseClient supabase}):
+      _supabase=supabase;
 
   String get _uid=>_supabase.auth.currentUser!.id;
 
@@ -31,7 +34,7 @@ class ApiClient{
     }
   }
 
-  Future<UserModel> signIn({required String email, required String password}) async{
+  Future<void> signIn({required String email, required String password}) async{
     AuthResponse res;
     try{
       res=await _supabase.auth.signInWithPassword(
@@ -41,19 +44,6 @@ class ApiClient{
 
       User? user=res.user;
       if(user==null) throw Exception("Login fallito: utente nullo"); //teoricamente non dovrebbe succedere perché catturo già l'eccezione di supabase
-      final String uuid=user.id;
-
-      final resJson=await _supabase
-          .from('users')
-          .select('''
-               *,
-               grades(*), 
-               exams(*)
-               ''') //join tra users, grades ed exams where userID=uuid
-          .eq('userID', uuid)
-          .single();
-
-      return UserModel.fromJson(resJson);
     }on AuthException{
       rethrow;
     }catch(e){
