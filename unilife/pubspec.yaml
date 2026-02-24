@@ -36,6 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   supabase_flutter: ^2.12.0
+  shadcn_ui: 0.26.0
 
 dev_dependencies:
   build_runner: ^2.4.9
@@ -91,3 +92,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+dependency_overrides:
+  intl: 0.20.2
+  shadcn_ui: 0.26.0 # Teniamo la 0.26.0 che non ha il bug del bordo
