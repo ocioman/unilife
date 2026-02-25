@@ -1,14 +1,12 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:unilife/model/user_model.dart';
 
-
 import 'model/exam.dart';
 import 'model/grade.dart';
 
-
 //TODO: sicurezza password e correttezza email
 
-class ApiClient{
+class ApiClient {
   final SupabaseClient _supabase;
 
   ApiClient({required SupabaseClient supabase}):
@@ -119,7 +117,8 @@ class ApiClient{
           .from('grades')
           .insert({
         'userID': _uid,
-        'examName': examName,
+        'examName': examName, //reso unique in modo che postgres lanci un eccezione se ci sono due voti per lo stesso esame
+                              //oppure due esami padre/parziali con lo stesso nome
         'value': value,
         'isPartial': isPartial,
         'parentGradeID': parentGradeID,
@@ -137,41 +136,202 @@ class ApiClient{
     }
   }
 
-  Future<double> computeAvg() async{
+  /*quando devo inserire un esame parziale devo sapere il parentGradeID, ma dato che
+    l'utente non conosce gli ID degli esami allora eseguo una query per ottenerlo tramite il nome (dato che è unique
+    avrò una sola row)*/
+  Future<int?> getParentGradeIdByName(String examName) async{
+    try {
+      List<dynamic> resJson=await _supabase
+          .from('grades')
+          .select('gradeID')
+          .eq('userID', _uid)
+          .eq('examName', examName)
+          .eq('isPartial', true)
+          .isFilter('parentGradeID', null);
+
+      if(resJson.isNotEmpty){
+        return resJson.first['gradeID'] as int;
+      }
+      return null;
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  //ogni esame padre avrà un menù a tendina con una lista di esami parziali all'interno
+  Future<List<Grade>> fetchPartialGrades(int parentGradeID) async{
     try{
-        double sumPartialGrades=0;
-        double sumNormalGrades=0;
-        int sumPartialCfu=0;
-        int sumNormalCfu=0;
+      List<Grade> grades=[];
+      List<dynamic> resJson=await _supabase
+          .from('grades')
+          .select()
+          .eq('userID', _uid)
+          .eq('isPartial', true)
+          .eq('parentGradeID', parentGradeID);
 
-        List<Map<String, dynamic>> resPartials=await _supabase
-            .from('completed_parent_exams_grades')
-            .select();
+      for(var v in resJson){
+        grades.add(Grade.fromJson(v as Map<String, dynamic>));
+      }
+      return grades;
+    }on PostgrestException {
+      rethrow;
+    }catch (e) {
+      rethrow;
+    }
+  }
 
-        List<Map<String, dynamic>> resNormal=await _supabase
+  /*se la somma dei pesi degli esami figli è =100 allora devo settare isCompleted dell'esame padre a true+
+    devo controllare che il weight inserito sommato ai weight degli altri parziali non sia >100
+   */
+  Future<int> getTotalWeightForParent(int parentGradeID) async{
+    try{
+      final grades=await fetchPartialGrades(parentGradeID);
+      int sum=0;
+      for(var g in grades){
+        sum+=g.weight??0;
+      }
+      return sum;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<void> updateGradeCompleted(int gradeID) async {
+    try{
+      await _supabase
+          .from('grades')
+          .update({'isCompleted': true})
+          .eq('gradeID', gradeID)
+          .eq('userID', _uid);
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<void> updateGrade({required int gradeID, String? examName, double? value, int? weight, int? cfu}) async{
+    try{
+        List<dynamic> toUpdateJson=await _supabase
             .from('grades')
             .select()
-            .eq('isPartial', false);
+            .eq('gradeID', gradeID);
 
-        if(resPartials.isNotEmpty){
-          for(var v in resPartials){
-            sumPartialGrades+=(v['final_grade'] as num).toDouble();
-            sumPartialCfu+=(v['cfu'] as num).toInt();
-          }
-        }
+        if(toUpdateJson.isEmpty) throw Exception("Voto non presente");
 
-        if(resNormal.isNotEmpty){
-          for(var v in resNormal){
-            sumNormalGrades+=(v['value'] as num).toDouble()*(v['cfu'] as num).toInt();
-            sumNormalCfu+=(v['cfu'] as num).toInt();
-          }
-        }
+        Grade toUpdate=Grade.fromJson(toUpdateJson.first as Map<String,dynamic>);
 
-        if(sumPartialCfu!=0||sumNormalCfu!=0){
-          return (sumPartialGrades+sumNormalGrades)/(sumPartialCfu+sumNormalCfu);
-        }else{
-          return 0.0;
+        Map<dynamic, dynamic> updates={
+          'examName': (examName==null)?toUpdate.examName:examName,
+          'value': (value==null)?toUpdate.value:value,
+          'weight': (weight==null)?toUpdate.weight:weight,
+          'cfu': (cfu==null)?toUpdate.cfu:cfu,
+        };
+
+        await _supabase
+          .from('grades')
+          .update(updates)
+          .eq('gradeID', gradeID);
+
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<void> updateExam({required int examID, DateTime? due, String? courseName, Priority? priority}) async{
+    try{
+      List<dynamic> toUpdateJson=await _supabase
+          .from('exams')
+          .select()
+          .eq('examID', examID);
+
+      if(toUpdateJson.isEmpty) throw Exception("Esame non presente");
+
+      Exam toUpdate=Exam.fromJson(toUpdateJson.first as Map<String, dynamic>);
+
+      Map<dynamic, dynamic> updates={
+        'due': (due==null)?toUpdate.due.toIso8601String():due.toIso8601String(),
+        'courseName': (courseName==null)?toUpdate.courseName:courseName,
+        'priority': (priority==null)?toUpdate.priority.name:priority.name,
+      };
+
+      await _supabase
+        .from('exams')
+        .update(updates)
+        .eq('examID', examID);
+
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+  
+  Future<void> deleteGrade({required int gradeID}) async{
+    try{
+      await _supabase
+          .from('grades')
+          .delete()
+          .eq('gradeID', gradeID);
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<void> deleteExam({required int examID}) async{
+    try{
+      await _supabase
+          .from('exams')
+          .delete()
+          .eq('examID', examID);
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<double> computeAvg() async {
+    try{
+      double sumPartialGrades=0;
+      double sumNormalGrades=0;
+      int sumPartialCfu=0;
+      int sumNormalCfu=0;
+
+      List<Map<String, dynamic>> resPartials=await _supabase
+          .from('completed_parent_exams_grades')
+          .select();
+
+      List<Map<String, dynamic>> resNormal=await _supabase
+          .from('grades')
+          .select()
+          .eq('isPartial', false);
+
+      if(resPartials.isNotEmpty){
+        for(var v in resPartials){
+          sumPartialGrades+=(v['final_grade'] as num).toDouble();
+          sumPartialCfu+=(v['cfu'] as num).toInt();
         }
+      }
+
+      if(resNormal.isNotEmpty){
+        for(var v in resNormal){
+          sumNormalGrades+=(v['value'] as num).toDouble()*(v['cfu'] as num).toInt();
+          sumNormalCfu+=(v['cfu'] as num).toInt();
+        }
+      }
+
+      if(sumPartialCfu!=0||sumNormalCfu!=0){
+        return (sumPartialGrades+sumNormalGrades)/(sumPartialCfu+sumNormalCfu);
+      }else{
+        return 0.0;
+      }
     }on PostgrestException{
       rethrow;
     }catch(e){
