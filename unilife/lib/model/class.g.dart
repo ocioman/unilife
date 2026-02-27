@@ -33,11 +33,11 @@ Map<String, dynamic> _$ClassToJson(Class instance) => <String, dynamic>{
 };
 
 const _$DayOfTheWeekEnumMap = {
-  DayOfTheWeek.monday: 'monday',
-  DayOfTheWeek.tuesday: 'tuesday',
-  DayOfTheWeek.wednesday: 'wednesday',
-  DayOfTheWeek.thursday: 'thursday',
-  DayOfTheWeek.friday: 'friday',
-  DayOfTheWeek.saturday: 'saturday',
-  DayOfTheWeek.sunday: 'sunday',
+  DayOfTheWeek.monday: 'Monday',
+  DayOfTheWeek.tuesday: 'Tuesday',
+  DayOfTheWeek.wednesday: 'Wednesday',
+  DayOfTheWeek.thursday: 'Thursday',
+  DayOfTheWeek.friday: 'Friday',
+  DayOfTheWeek.saturday: 'Saturday',
+  DayOfTheWeek.sunday: 'Sunday',
 };

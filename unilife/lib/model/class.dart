@@ -38,7 +38,7 @@ class Class {
   Map<String, dynamic> toJson() => _$ClassToJson(this);
 }
 
-@JsonEnum()
+@JsonEnum(valueField: 'value')
 enum DayOfTheWeek {
   monday('Monday'),
   tuesday('Tuesday'),
