@@ -170,6 +170,7 @@ class ApiClient{
       List<dynamic> resJson=await _supabase
         .from('classes')
         .insert({
+          'userID': _uid,
           'day': day.value,
           'classType': classType,
           'from': from.toSqlTime(),
@@ -340,7 +341,7 @@ class ApiClient{
           'day': day?.value??toUpdate.day.value,
           'classType': classType??toUpdate.classType,
           'from': from?.toSqlTime()??toUpdate.from.toSqlTime(),
-          'to': to?.toSqlTime()??toUpdate.from.toSqlTime(),
+          'to': to?.toSqlTime()??toUpdate.to.toSqlTime(),
           'room': room??toUpdate.room,
           'profName': profName??toUpdate.profName,
           'profSurname': profSurname??toUpdate.profSurname,
