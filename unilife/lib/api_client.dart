@@ -375,12 +375,23 @@ class ApiClient{
 
   Future<Grade> deleteGrade({required int gradeID})async{
     try{
-      List<dynamic> resJson=await _supabase
+      final resJson = await _supabase
           .from('grades')
           .delete()
           .eq('gradeID', gradeID)
           .select();
-      return Grade.fromJson(resJson.first as Map<String, dynamic>);
+      
+      if (resJson.isEmpty) {
+        throw Exception("Voto non trovato o già eliminato");
+      }
+      
+      final Map<String, dynamic> data=Map<String, dynamic>.from(resJson.first as Map);
+      
+      data['examName']??='Eliminato';
+      data['userID']??=_uid;
+      data['isPartial']??=false;
+      
+      return Grade.fromJson(data);
     }on PostgrestException {
       rethrow;
     }catch (e){
@@ -432,15 +443,19 @@ class ApiClient{
 
       if(resPartials.isNotEmpty){
         for(var v in resPartials){
-          sumPartialGrades+=(v['final_grade'] as num).toDouble();
-          sumPartialCfu+=(v['cfu'] as num).toInt();
+          final finalGrade = (v['final_grade'] as num?)?.toDouble() ?? 0.0;
+          final cfu = (v['cfu'] as num?)?.toInt() ?? 0;
+          sumPartialGrades += finalGrade;
+          sumPartialCfu += cfu;
         }
       }
 
       if(resNormal.isNotEmpty){
         for(var v in resNormal){
-          sumNormalGrades+=(v['value'] as num).toDouble() * (v['cfu'] as num).toInt();
-          sumNormalCfu+=(v['cfu'] as num).toInt();
+          final val = (v['value'] as num?)?.toDouble() ?? 0.0;
+          final cfu = (v['cfu'] as num?)?.toInt() ?? 0;
+          sumNormalGrades += val * cfu;
+          sumNormalCfu += cfu;
         }
       }
 
