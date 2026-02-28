@@ -30,7 +30,7 @@ class Grade{
     required this.isPartial,
     this.parentGradeID,
     this.isCompleted,
-    required this.weight,
+    this.weight,
   });
 
   factory Grade.fromJson(Map<String, dynamic> json)=>_$GradeFromJson(json);

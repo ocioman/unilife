@@ -266,6 +266,20 @@ class ApiClient{
     }
   }
 
+  Future<void> updateGradeNotCompleted(int gradeID) async{
+    try{
+      await _supabase
+          .from('grades')
+          .update({'isCompleted': false})
+          .eq('gradeID', gradeID)
+          .eq('userID', _uid);
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
   Future<void> updateGrade({required int gradeID, String? examName, double? value, int? weight, int? cfu,}) async{
     try{
       List<dynamic> toUpdateJson=await _supabase
@@ -359,12 +373,14 @@ class ApiClient{
     }
   }
 
-  Future<void> deleteGrade({required int gradeID})async{
+  Future<Grade> deleteGrade({required int gradeID})async{
     try{
-      await _supabase
+      List<dynamic> resJson=await _supabase
           .from('grades')
           .delete()
-          .eq('gradeID', gradeID);
+          .eq('gradeID', gradeID)
+          .select();
+      return Grade.fromJson(resJson.first as Map<String, dynamic>);
     }on PostgrestException {
       rethrow;
     }catch (e){
