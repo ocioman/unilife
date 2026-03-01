@@ -6,7 +6,7 @@ import 'login_page.dart';
 
 late final ApiClient apiClient;
 
-Future<void> main() async {
+Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
@@ -14,29 +14,25 @@ Future<void> main() async {
     anonKey: 'sb_publishable_xlSSwoM1l4ArAfQHdsCFGQ_umcYkzBa',
   );
 
-  final supabase = Supabase.instance.client;
+  final supabase=Supabase.instance.client;
 
   apiClient=ApiClient(supabase: supabase);
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget{
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return ShadApp(
-      debugShowCheckedModeBanner: false,
-      title: 'unilife',
-      darkTheme: ShadThemeData(
+      title: 'Unilife',
+      theme: ShadThemeData(
         brightness: Brightness.dark,
-        colorScheme: const ShadSlateColorScheme.dark(),
+        colorScheme: const ShadZincColorScheme.dark(),
       ),
-      builder: (context, child) {
-        return ShadToaster(child: child!);
-      },
-      home: LoginPage(),
+      home: const LoginPage(),
     );
   }
 }
