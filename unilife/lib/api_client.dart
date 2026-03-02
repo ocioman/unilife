@@ -443,19 +443,19 @@ class ApiClient{
 
       if(resPartials.isNotEmpty){
         for(var v in resPartials){
-          final finalGrade = (v['final_grade'] as num?)?.toDouble() ?? 0.0;
-          final cfu = (v['cfu'] as num?)?.toInt() ?? 0;
-          sumPartialGrades += finalGrade;
-          sumPartialCfu += cfu;
+          final finalGrade=(v['final_grade'] as num?)?.toDouble() ?? 0.0;
+          final cfu=(v['cfu'] as num?)?.toInt()??0;
+          sumPartialGrades+=finalGrade;
+          sumPartialCfu+=cfu;
         }
       }
 
       if(resNormal.isNotEmpty){
         for(var v in resNormal){
-          final val = (v['value'] as num?)?.toDouble() ?? 0.0;
-          final cfu = (v['cfu'] as num?)?.toInt() ?? 0;
-          sumNormalGrades += val * cfu;
-          sumNormalCfu += cfu;
+          final val=(v['value'] as num?)?.toDouble()??0.0;
+          final cfu = (v['cfu'] as num?)?.toInt()??0;
+          sumNormalGrades+=val*cfu;
+          sumNormalCfu+=cfu;
         }
       }
 
