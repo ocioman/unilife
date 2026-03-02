@@ -357,9 +357,9 @@ class ApiClient{
           'from': from?.toSqlTime()??toUpdate.from.toSqlTime(),
           'to': to?.toSqlTime()??toUpdate.to.toSqlTime(),
           'room': room??toUpdate.room,
-          'profName': profName??toUpdate.profName,
-          'profSurname': profSurname??toUpdate.profSurname,
-          'profEmail': profEmail??toUpdate.profEmail,
+          'profName': profName,
+          'profSurname': profSurname,
+          'profEmail': profEmail,
         };
 
         await _supabase

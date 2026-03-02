@@ -26,12 +26,10 @@ class Class {
     required this.from,
     required this.to,
     required this.room,
-    String? profName,
-    String? profSurname,
-    String? profEmail,
-  }) : profName = profName ?? 'Nessun nome',
-       profSurname = profSurname ?? 'Nessun cognome',
-       profEmail = profEmail ?? 'Nessuna email';
+    this.profName,
+    this.profSurname,
+    this.profEmail,
+  });
 
   factory Class.fromJson(Map<String, dynamic> json) => _$ClassFromJson(json);
 
