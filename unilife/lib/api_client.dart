@@ -42,12 +42,13 @@ class ApiClient{
       await _supabase.auth
           .signInWithPassword(email: email, password: password);
 
-      List<dynamic> resJson=await _supabase
+      Map<String, dynamic> resJson=await _supabase
           .from('users')
           .select()
-          .eq('userID', _uid);
+          .eq('userID', _uid)
+          .single(); //single così non mi ritorna una lista di Map<String, dynamic> con un solo elemento
 
-      return UserModel.fromJson(resJson.first as Map<String, dynamic>);
+      return UserModel.fromJson(resJson);
     }on AuthException{
       rethrow;
     }catch (e){
@@ -57,19 +58,20 @@ class ApiClient{
 
   Future<List<Exam>> fetchExams() async{
     try{
-      List<Exam> exams=[];
-
-      List<dynamic> resJson=
-          await _supabase //tecnicamente ritorna una lista di Map<String, dynamic>
+      List<Map<String, dynamic>> resJson=
+          await _supabase
               .from('exams')
               .select()
               .eq('userID', _uid);
 
-      for(var v in resJson){
-        exams.add(Exam.fromJson(v as Map<String, dynamic>));
-      }
+      /*
+        Rimosso il for in e la lista, tramite questo return creo un iterable lazy e non eseguo nulla
+        finché gli elementi non vengono richiesti, quando .toList(); viene chiamato, materializza l'iterable lazy e quindi
+        itero su resJson e per ciascun elemento di resJson metto nella nuova lista l'elemento deserializzato, + easy
+        a discapito di un po' di readability
+       */
+      return resJson.map((element)=>Exam.fromJson(element)).toList();
 
-      return exams;
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -79,18 +81,13 @@ class ApiClient{
 
   Future<List<Grade>> fetchGrades() async{
     try{
-      List<Grade> grades=[];
 
-      List<dynamic> resJson=await _supabase
+      List<Map<String, dynamic>> resJson=await _supabase
           .from('grades')
           .select()
           .eq('userID', _uid);
-
-      for(var v in resJson){
-        grades.add(Grade.fromJson(v as Map<String, dynamic>));
-      }
-
-      return grades;
+      
+      return resJson.map((element)=>Grade.fromJson(element)).toList();
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -100,18 +97,12 @@ class ApiClient{
 
   Future<List<Class>> fetchClasses() async{
     try{
-      List<Class> classes=[];
-
-      List<dynamic> resJson=await _supabase
+      List<Map<String, dynamic>> resJson=await _supabase
           .from('classes')
           .select()
           .eq('userID', _uid);
 
-      for(var v in resJson){
-        classes.add(Class.fromJson(v as Map<String, dynamic>));
-      }
-
-      return classes;
+      return resJson.map((element)=>Class.fromJson(element)).toList();
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -121,16 +112,17 @@ class ApiClient{
 
   Future<Exam> addExam({required DateTime due, required String courseName, required Priority priority,}) async{
     try{
-      List<dynamic> resJson=await _supabase
+      Map<String, dynamic> resJson=await _supabase
             .from('exams')
             .insert({
               'userID': _uid,
               'due': due.toIso8601String(),
               'courseName': courseName,
               'priority': priority.name,
-            }).select();
+            }).select()
+            .single();
 
-      return Exam.fromJson(resJson.first as Map<String, dynamic>);
+      return Exam.fromJson(resJson);
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -141,7 +133,7 @@ class ApiClient{
   Future<Grade> addGrade({required String examName, double? value, required bool isPartial, int? parentGradeID,
     bool? isCompleted, int? weight, int? cfu,}) async{
     try{
-      List<dynamic> resJson=await _supabase
+      Map<String, dynamic> resJson=await _supabase
           .from('grades').insert({
             'userID': _uid,
             'examName':
@@ -154,9 +146,10 @@ class ApiClient{
             'weight': weight,
             'cfu': cfu,
           })
-          .select();
+          .select()
+          .single();
 
-      return Grade.fromJson(resJson.first as Map<String, dynamic>);
+      return Grade.fromJson(resJson);
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -167,7 +160,7 @@ class ApiClient{
   Future<Class> addClass({required DayOfTheWeek day, required String classType, required HoursMins from,
   required HoursMins to, required String room, String? profName, String? profSurname, String? profEmail}) async{
     try{
-      List<dynamic> resJson=await _supabase
+      Map<String, dynamic> resJson=await _supabase
         .from('classes')
         .insert({
           'userID': _uid,
@@ -179,9 +172,10 @@ class ApiClient{
           'profName': profName,
           'profSurname': profSurname,
           'profEmail': profEmail,
-        }).select();
+        }).select()
+        .single();
 
-        return Class.fromJson(resJson.first as Map<String, dynamic>); 
+        return Class.fromJson(resJson);
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -195,18 +189,16 @@ class ApiClient{
     avrò una sola row)*/
   Future<int?> getParentGradeIdByName(String examName) async{
     try{
-      List<dynamic> resJson=await _supabase
+      Map<String, dynamic> resJson=await _supabase
           .from('grades')
           .select('gradeID')
           .eq('userID', _uid)
           .eq('examName', examName)
           .eq('isPartial', true)
-          .isFilter('parentGradeID', null);
+          .isFilter('parentGradeID', null)
+          .single();
 
-      if(resJson.isNotEmpty){
-        return resJson.first['gradeID'] as int;
-      }
-      return null;
+      return resJson['gradeID'] as int;
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -217,18 +209,14 @@ class ApiClient{
   //ogni esame padre avrà un menù a tendina con una lista di esami parziali all'interno
   Future<List<Grade>> fetchPartialGrades(int parentGradeID) async{
     try{
-      List<Grade> grades=[];
-      List<dynamic> resJson=await _supabase
+      List<Map<String, dynamic>> resJson=await _supabase
           .from('grades')
           .select()
           .eq('userID', _uid)
           .eq('isPartial', true)
           .eq('parentGradeID', parentGradeID);
 
-      for(var v in resJson){
-        grades.add(Grade.fromJson(v as Map<String, dynamic>));
-      }
-      return grades;
+      return resJson.map((element)=>Grade.fromJson(element)).toList();
     }on PostgrestException{
       rethrow;
     }catch (e){
@@ -241,7 +229,7 @@ class ApiClient{
    */
   Future<int> getTotalWeightForParent(int parentGradeID) async{
     try{
-      final grades=await fetchPartialGrades(parentGradeID);
+      List<Grade> grades=await fetchPartialGrades(parentGradeID);
       int sum=0;
       for(var g in grades){
         sum+=g.weight??0;
@@ -282,16 +270,13 @@ class ApiClient{
 
   Future<void> updateGrade({required int gradeID, String? examName, double? value, int? weight, int? cfu,}) async{
     try{
-      List<dynamic> toUpdateJson=await _supabase
+      Map<String, dynamic> toUpdateJson=await _supabase
           .from('grades')
           .select()
-          .eq('gradeID', gradeID);
+          .eq('gradeID', gradeID)
+          .single();
 
-      if(toUpdateJson.isEmpty) throw Exception("Voto non presente");
-
-      Grade toUpdate=Grade.fromJson(
-        toUpdateJson.first as Map<String, dynamic>,
-      );
+      Grade toUpdate=Grade.fromJson(toUpdateJson);
 
       Map<dynamic, dynamic> updates={
         'examName': examName??toUpdate.examName,
@@ -313,14 +298,13 @@ class ApiClient{
 
   Future<void> updateExam({required int examID, DateTime? due, String? courseName, Priority? priority,}) async{
     try{
-      List<dynamic> toUpdateJson=await _supabase
+      Map<String, dynamic> toUpdateJson=await _supabase
           .from('exams')
           .select()
-          .eq('examID', examID);
+          .eq('examID', examID)
+          .single();
 
-      if(toUpdateJson.isEmpty) throw Exception("Esame non presente");
-
-      Exam toUpdate=Exam.fromJson(toUpdateJson.first as Map<String, dynamic>);
+      Exam toUpdate=Exam.fromJson(toUpdateJson);
 
       Map<dynamic, dynamic> updates={
         'due': due?.toIso8601String()??toUpdate.due.toIso8601String(),
@@ -342,14 +326,13 @@ class ApiClient{
   Future<void> updateClass({required int classID,  DayOfTheWeek? day,  String? classType,  HoursMins? from,
    HoursMins? to,  String? room, String? profName, String? profSurname, String? profEmail}) async{
     try{
-        List<dynamic> updateJson=await _supabase
+      Map<String, dynamic> updateJson=await _supabase
           .from('classes')
           .select()
-          .eq('classID', classID);
+          .eq('classID', classID)
+          .single();
 
-        if(updateJson.isEmpty) throw Exception("Classe non trovata"); 
-
-        Class toUpdate=Class.fromJson(updateJson.first as Map<String, dynamic>);
+        Class toUpdate=Class.fromJson(updateJson);
 
         Map<dynamic, dynamic> updates={
           'day': day?.value??toUpdate.day.value,
@@ -375,23 +358,18 @@ class ApiClient{
 
   Future<Grade> deleteGrade({required int gradeID})async{
     try{
-      final resJson = await _supabase
+      Map<String, dynamic> resJson=await _supabase
           .from('grades')
           .delete()
           .eq('gradeID', gradeID)
-          .select();
+          .select()
+          .single();
       
-      if (resJson.isEmpty) {
-        throw Exception("Voto non trovato o già eliminato");
-      }
+      resJson['examName']??='Eliminato';
+      resJson['userID']??=_uid;
+      resJson['isPartial']??=false;
       
-      final Map<String, dynamic> data=Map<String, dynamic>.from(resJson.first as Map);
-      
-      data['examName']??='Eliminato';
-      data['userID']??=_uid;
-      data['isPartial']??=false;
-      
-      return Grade.fromJson(data);
+      return Grade.fromJson(resJson);
     }on PostgrestException {
       rethrow;
     }catch (e){
@@ -443,8 +421,8 @@ class ApiClient{
 
       if(resPartials.isNotEmpty){
         for(var v in resPartials){
-          final finalGrade=(v['final_grade'] as num?)?.toDouble() ?? 0.0;
-          final cfu=(v['cfu'] as num?)?.toInt()??0;
+          final double finalGrade=(v['final_grade'] as num?)?.toDouble() ?? 0.0;
+          final int cfu=(v['cfu'] as num?)?.toInt()??0;
           sumPartialGrades+=finalGrade;
           sumPartialCfu+=cfu;
         }
@@ -452,8 +430,8 @@ class ApiClient{
 
       if(resNormal.isNotEmpty){
         for(var v in resNormal){
-          final val=(v['value'] as num?)?.toDouble()??0.0;
-          final cfu = (v['cfu'] as num?)?.toInt()??0;
+          final double val=(v['value'] as num?)?.toDouble()??0.0;
+          final int cfu = (v['cfu'] as num?)?.toInt()??0;
           sumNormalGrades+=val*cfu;
           sumNormalCfu+=cfu;
         }
