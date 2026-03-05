@@ -334,7 +334,7 @@ class ApiClient{
 
         Class toUpdate=Class.fromJson(updateJson);
 
-        Map<dynamic, dynamic> updates={
+        Map<String, dynamic> updates={
           'day': day?.value??toUpdate.day.value,
           'classType': classType??toUpdate.classType,
           'from': from?.toSqlTime()??toUpdate.from.toSqlTime(),
