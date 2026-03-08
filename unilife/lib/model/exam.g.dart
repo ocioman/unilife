@@ -10,6 +10,7 @@ Exam _$ExamFromJson(Map<String, dynamic> json) => Exam(
   examID: (json['examID'] as num).toInt(),
   userID: json['userID'] as String,
   due: DateTime.parse(json['due'] as String),
+  time: const HoursMinsConverter().fromJson(json['time'] as String),
   courseName: json['courseName'] as String,
   priority: $enumDecode(_$PriorityEnumMap, json['priority']),
 );
@@ -18,6 +19,7 @@ Map<String, dynamic> _$ExamToJson(Exam instance) => <String, dynamic>{
   'examID': instance.examID,
   'userID': instance.userID,
   'due': instance.due.toIso8601String(),
+  'time': const HoursMinsConverter().toJson(instance.time),
   'courseName': instance.courseName,
   'priority': _$PriorityEnumMap[instance.priority]!,
 };

@@ -110,13 +110,14 @@ class ApiClient{
     }
   }
 
-  Future<Exam> addExam({required DateTime due, required String courseName, required Priority priority,}) async{
+  Future<Exam> addExam({required DateTime due, required String courseName, required Priority priority, required HoursMins time}) async{
     try{
       Map<String, dynamic> resJson=await _supabase
             .from('exams')
             .insert({
               'userID': _uid,
               'due': due.toIso8601String(),
+              'time': time.toSqlTime(),
               'courseName': courseName,
               'priority': priority.name,
             }).select()
@@ -296,7 +297,7 @@ class ApiClient{
     }
   }
 
-  Future<void> updateExam({required int examID, DateTime? due, String? courseName, Priority? priority,}) async{
+  Future<void> updateExam({required int examID, DateTime? due, String? courseName, Priority? priority, HoursMins? time}) async{
     try{
       Map<String, dynamic> toUpdateJson=await _supabase
           .from('exams')
@@ -310,6 +311,7 @@ class ApiClient{
         'due': due?.toIso8601String()??toUpdate.due.toIso8601String(),
         'courseName': courseName??toUpdate.courseName,
         'priority': priority?.name??toUpdate.priority.name,
+        'time': time?.toSqlTime()??toUpdate.time.toSqlTime(),
       };
 
       await _supabase

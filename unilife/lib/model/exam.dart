@@ -1,12 +1,16 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:unilife/model/hours_mins.dart';
+import 'package:unilife/model/hours_mins_converter.dart';
 
 part 'exam.g.dart';
 
 @JsonSerializable()
+@HoursMinsConverter()
 class Exam{
   final int examID; //pk
   final String userID; //fk
   DateTime due;
+  HoursMins time;
   String courseName;
   Priority priority;
 
@@ -14,6 +18,7 @@ class Exam{
     required this.examID, //facendo required this... rendo il parametro mandatory e lo assegno automaticamente all'attributo
     required this.userID,
     required this.due,
+    required this.time,
     required this.courseName,
     required this.priority
   });
