@@ -34,7 +34,7 @@ class _SignupPageState extends State<SignupPage>{
     final nome=_nomeController.text.trim();
     final cognome=_cognomeController.text.trim();
     final email=_emailController.text.trim();
-    final password=_passwordController.text;
+    final password=_passwordController.text.trim();
     final secondoNome=_secondoNomeController.text.trim();
 
     if(nome.isEmpty||cognome.isEmpty||email.isEmpty||password.isEmpty) {

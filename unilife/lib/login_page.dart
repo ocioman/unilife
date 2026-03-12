@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage>{
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
-    final password = _passwordController.text;
+    final password = _passwordController.text.trim();
     if(email.isEmpty || password.isEmpty) {
       ShadToaster.of(context).show(
         ShadToast.destructive(

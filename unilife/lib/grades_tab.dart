@@ -94,6 +94,26 @@ class _GradesTabState extends State<GradesTab> {
           );
         }
         return;
+      }else if(value>30){
+        if(context.mounted){
+          ShadToaster.of(context).show(
+            ShadToast.destructive(
+              title: Text('Errore'),
+              description: Text('Il voto deve essere minore o uguale a 30'),
+            )
+          );
+          return;
+        }
+      }else if(value<17){
+        if(context.mounted){
+          ShadToaster.of(context).show(
+            ShadToast.destructive(
+              title: Text('Errore'),
+              description: Text('Il voto deve essere maggiore o uguale a 17'),
+            )
+          );
+        }
+        return;
       }
     }
 
@@ -1138,6 +1158,89 @@ class _GradesTabState extends State<GradesTab> {
     );
   }
 
+  Widget _buildDrawer(){
+    return Drawer(
+      backgroundColor: const Color(0xFF1A1A1A),
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 32,
+          ),
+          _createHeader(),
+          Divider(
+            color: Colors.white54,
+            thickness: 0.0,
+          ),
+          _createDrawerItem(icon: Icons.settings, text: "Impostazioni", onTap: ()=>0),
+          Divider(
+            indent: 12,
+            endIndent: 12,
+            color: Colors.white54,
+            thickness: 0.0,
+          ),
+          _createDrawerItem(icon: Icons.logout, text: "Logout", onTap: ()=>0),
+          Divider(
+            indent: 12,
+            endIndent: 12,
+            color: Colors.white54,
+            thickness: 0.0,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _createHeader() {
+    return Container(
+        height: 80,
+        color: Color(0xFF1A1A1A),
+        child: ListTile(
+          title: Text(
+              "Name",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            )
+          ),
+          subtitle: Text(
+              "Name",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              )
+          ),
+          dense: true,
+          leading: CircleAvatar(child: Icon(Icons.person)),
+        )
+    );
+  }
+
+  Widget _createDrawerItem(
+      {required IconData icon,
+        required String text,
+        required GestureTapCallback onTap}) {
+    return ListTile(
+      title: Row(
+        children: [
+          Icon(icon),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+            ),
+          )
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final allGrades = widget.grades;
@@ -1147,10 +1250,26 @@ class _GradesTabState extends State<GradesTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Voti Registrati'),
+        title: const Text(
+            'Voti Registrati',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+        ),
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
+        leading: Builder(
+            builder: (context) {
+              return IconButton(
+                  icon: const Icon(Icons.menu_rounded),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  }
+              );
+            }
+        ),
       ),
+      drawer: _buildDrawer(),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
