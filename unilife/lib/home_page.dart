@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unilife/login_page.dart';
 import 'package:unilife/main.dart';
 import 'grades_tab.dart';
 import 'exams_tab.dart';
@@ -6,9 +7,15 @@ import 'classes_tab.dart';
 import 'model/grade.dart';
 import 'model/exam.dart';
 import 'model/class.dart';
+import 'model/user_model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final UserModel activeUser;
+
+  const HomePage({
+    super.key,
+    required this.activeUser,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -120,6 +127,116 @@ class _HomePageState extends State<HomePage> {
     setState(() => _classes.removeWhere((c) => c.classID == classID));
   }
 
+  //metodo di logout per tutte le tab
+  Future<void> _signOut() async {
+    setState(()=>_isLoading=true);
+
+    try{
+      await apiClient.signOutUser();
+      if(!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_)=>const LoginPage()),
+      );
+    }catch(_){ }finally{
+      setState(()=>_isLoading=false);
+    }
+  }
+
+  //metodi per il mettere il drawer in tutte le tabs
+
+  Widget _createHeader() {
+    return Container(
+        height: 80,
+        color: Color(0xFF1A1A1A),
+        child: ListTile(
+          title: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+                widget.activeUser.email,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          subtitle: Text(
+              widget.activeUser.name1,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              )
+          ),
+          dense: true,
+          leading: CircleAvatar(child: Icon(Icons.person)),
+        )
+    );
+  }
+
+  Widget _createDrawerItem(
+      {required IconData icon,
+        required String text,
+        required GestureTapCallback onTap}) {
+    return ListTile(
+      title: Row(
+        children: [
+          Icon(icon),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16
+              ),
+            ),
+          )
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildDrawer(){
+    return Drawer(
+      backgroundColor: const Color(0xFF1A1A1A),
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 32,
+          ),
+          _createHeader(),
+          SizedBox(
+            height: 16,
+          ),
+          Divider(
+            color: Colors.white54,
+            thickness: 0.0,
+          ),
+
+          _createDrawerItem(icon: Icons.settings, text: "Impostazioni", onTap: ()=>0),
+          Divider(
+            indent: 12,
+            endIndent: 12,
+            color: Colors.white54,
+            thickness: 0.0,
+          ),
+          _createDrawerItem(icon: Icons.logout, text: "Logout", onTap: ()=>_signOut()),
+          Divider(
+            indent: 12,
+            endIndent: 12,
+            color: Colors.white54,
+            thickness: 0.0,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -139,18 +256,21 @@ class _HomePageState extends State<HomePage> {
         onGradeUpdated: _onGradeUpdated,
         onGradeDeleted: _onGradeDeleted,
         onGradeCompletionChanged: _onGradeCompletionChanged,
+        drawerWidget: _buildDrawer(),
       ),
       ExamsTab(
         exams: _exams,
         onExamAdded: _onExamAdded,
         onExamUpdated: _onExamUpdated,
         onExamDeleted: _onExamDeleted,
+        drawerWidget: _buildDrawer(),
       ),
       ClassesTab(
         classes: _classes,
         onClassAdded: _onClassAdded,
         onClassUpdated: _onClassUpdated,
         onClassDeleted: _onClassDeleted,
+        drawerWidget: _buildDrawer(),
       ),
     ];
 

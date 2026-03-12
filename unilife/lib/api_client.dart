@@ -56,6 +56,16 @@ class ApiClient{
     }
   }
 
+  Future<void> signOutUser() async {
+    try{
+      await _supabase.auth.signOut();
+    }on AuthException{
+      rethrow;
+    }catch (e){
+      rethrow;
+    }
+  }
+
   Future<List<Exam>> fetchExams() async{
     try{
       List<Map<String, dynamic>> resJson=

@@ -11,7 +11,7 @@ class GradesTab extends StatefulWidget {
   final void Function(int, Grade) onGradeUpdated;
   final void Function(int) onGradeDeleted;
   final void Function(int, bool) onGradeCompletionChanged;
-
+  final Widget drawerWidget;
   const GradesTab({
     super.key,
     required this.grades,
@@ -20,6 +20,7 @@ class GradesTab extends StatefulWidget {
     required this.onGradeUpdated,
     required this.onGradeDeleted,
     required this.onGradeCompletionChanged,
+    required this.drawerWidget,
   });
 
   @override
@@ -1158,88 +1159,6 @@ class _GradesTabState extends State<GradesTab> {
     );
   }
 
-  Widget _buildDrawer(){
-    return Drawer(
-      backgroundColor: const Color(0xFF1A1A1A),
-      child: ListView(
-        children: [
-          SizedBox(
-            height: 32,
-          ),
-          _createHeader(),
-          Divider(
-            color: Colors.white54,
-            thickness: 0.0,
-          ),
-          _createDrawerItem(icon: Icons.settings, text: "Impostazioni", onTap: ()=>0),
-          Divider(
-            indent: 12,
-            endIndent: 12,
-            color: Colors.white54,
-            thickness: 0.0,
-          ),
-          _createDrawerItem(icon: Icons.logout, text: "Logout", onTap: ()=>0),
-          Divider(
-            indent: 12,
-            endIndent: 12,
-            color: Colors.white54,
-            thickness: 0.0,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _createHeader() {
-    return Container(
-        height: 80,
-        color: Color(0xFF1A1A1A),
-        child: ListTile(
-          title: Text(
-              "Name",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            )
-          ),
-          subtitle: Text(
-              "Name",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              )
-          ),
-          dense: true,
-          leading: CircleAvatar(child: Icon(Icons.person)),
-        )
-    );
-  }
-
-  Widget _createDrawerItem(
-      {required IconData icon,
-        required String text,
-        required GestureTapCallback onTap}) {
-    return ListTile(
-      title: Row(
-        children: [
-          Icon(icon),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text(
-                text,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-            ),
-          )
-        ],
-      ),
-      onTap: onTap,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1269,7 +1188,7 @@ class _GradesTabState extends State<GradesTab> {
             }
         ),
       ),
-      drawer: _buildDrawer(),
+      drawer: widget.drawerWidget,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

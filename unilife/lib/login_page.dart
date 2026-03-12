@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:unilife/model/user_model.dart';
 import 'main.dart';
 import 'signup_page.dart';
 import 'home_page.dart';
@@ -55,10 +56,10 @@ class _LoginPageState extends State<LoginPage>{
     }
     setState(()=> _isLoading=true);
     try{
-      await apiClient.signIn(email: email, password: password);
+      UserModel activeUser=await apiClient.signIn(email: email, password: password);
       if(!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_)=>const HomePage()),
+        MaterialPageRoute(builder: (_)=>HomePage(activeUser: activeUser)),
       );
     }on AuthException catch(e){
       if(!mounted) return;
