@@ -66,6 +66,50 @@ class ApiClient{
     }
   }
 
+  Future<void> updateEmail({required String newEmail, required String password}) async{
+    try{
+      await _supabase.auth.signInWithPassword(
+          password: password
+      );
+
+      await _supabase.auth.updateUser(
+        UserAttributes(email: newEmail),
+      );
+
+      await _supabase
+        .from('users')
+        .update(
+          {
+            'email':newEmail,
+          }
+        )
+        .eq('userID', _uid);
+
+    }on AuthException{
+      rethrow;
+    }on PostgrestException{
+      rethrow;
+    }catch(e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updatePassword({required String oldPassword, required String newPassword}) async{
+    try{
+      await _supabase.auth.signInWithPassword(
+        password: oldPassword,
+      );
+
+      await _supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+    }on AuthException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
   Future<List<Exam>> fetchExams() async{
     try{
       List<Map<String, dynamic>> resJson=

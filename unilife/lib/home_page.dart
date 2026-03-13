@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:unilife/login_page.dart';
 import 'package:unilife/main.dart';
+import 'package:unilife/settings.dart';
 import 'grades_tab.dart';
 import 'exams_tab.dart';
 import 'classes_tab.dart';
@@ -10,13 +11,15 @@ import 'model/class.dart';
 import 'model/user_model.dart';
 
 class HomePage extends StatefulWidget {
-  final UserModel activeUser;
+  final UserModel _activeUser;
 
   const HomePage({
     super.key,
-    required this.activeUser,
-  });
+    required activeUser,
+  }):
+      _activeUser=activeUser;
 
+  UserModel get activeUser=>_activeUser;
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -142,6 +145,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _goToSettings({required UserModel activeUser}){
+    if(!mounted) return;
+    Navigator.of(context).pop(); //chiudo il drawer sennò rimane glitchato nella transizione
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_)=>Settings(activeUser: activeUser)),
+    );
+  }
+
   //metodi per il mettere il drawer in tutte le tabs
 
   Widget _createHeader() {
@@ -218,7 +229,7 @@ class _HomePageState extends State<HomePage> {
             thickness: 0.0,
           ),
 
-          _createDrawerItem(icon: Icons.settings, text: "Impostazioni", onTap: ()=>0),
+          _createDrawerItem(icon: Icons.settings, text: "Impostazioni", onTap: ()=>_goToSettings(activeUser: widget.activeUser)),
           Divider(
             indent: 12,
             endIndent: 12,
