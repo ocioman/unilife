@@ -14,6 +14,9 @@ class Settings extends StatefulWidget{
   UserModel get activeUser=>_activeUser;
 
   set activeUserEmail(String email)=>_activeUser.email=email;
+  set activeUserName1(String name1)=>_activeUser.name1=name1;
+  set activeUserName2(String name2)=>_activeUser.name1=name2;
+  set activeUserSurname1(String surname)=>_activeUser.surname=surname;
 
   @override
   State<StatefulWidget> createState()=>_SettingsState();
@@ -23,6 +26,10 @@ class _SettingsState extends State<Settings>{
   final _passwordController=TextEditingController();
   final _newPasswordController=TextEditingController();
   final _newEmailController=TextEditingController();
+  final _newName1Controller=TextEditingController();
+  final _newName2Controller=TextEditingController();
+  final _newSurnameController=TextEditingController();
+
   bool _isLoadingDialog=false;
   bool _obscurePassword=true;
   bool _obscureNewPassword=true;
@@ -31,6 +38,9 @@ class _SettingsState extends State<Settings>{
     _passwordController.dispose();
     _newPasswordController.dispose();
     _newEmailController.dispose();
+    _newName1Controller.dispose();
+    _newName2Controller.dispose();
+    _newSurnameController.dispose();
     super.dispose();
   }
 
@@ -132,6 +142,282 @@ class _SettingsState extends State<Settings>{
       oldPassword=null;
       if (mounted) setDialogState(() => _isLoadingDialog = false);
     }
+  }
+
+  Future<void> _updateNames(int nameType, BuildContext dialogContext, void Function(void Function()) setDialogState) async{
+
+    String newName=(nameType==1)?_newName1Controller.text.trim():_newName2Controller.text.trim();
+
+    if(newName.isEmpty){
+      ShadToaster.of(context).show(
+          const ShadToast.destructive(
+            title: Text('Errore'),
+            description: Text('Compila tutti i campi.'),
+          )
+      );
+      return;
+    }
+
+    final navigator = Navigator.of(dialogContext);
+
+    setDialogState(()=>_isLoadingDialog=true);
+
+    try{
+      (nameType==1)?await apiClient.updatePersonalData(name1: newName):await apiClient.updatePersonalData(name2: newName);
+      if(!mounted) return;
+      navigator.pop();
+      setState(()=>(nameType==1)?widget.activeUser.name1=newName:widget.activeUser.name2=newName);
+    }catch(e){
+      if (!context.mounted) return;
+      ShadToaster.of(context).show(
+        const ShadToast.destructive(
+          title: Text('Errore'),
+          description: Text('Impossibile modificare il nome.'),
+        ),
+      );
+    }finally{
+      if (mounted) setDialogState(() => _isLoadingDialog = false);
+    }
+  }
+
+  Future<void> _updateSurname(BuildContext dialogContext, void Function(void Function()) setDialogState) async{
+    String? newSurname=_newSurnameController.text.trim();
+
+    if(newSurname.isEmpty){
+      ShadToaster.of(context).show(
+          const ShadToast.destructive(
+            title: Text('Errore'),
+            description: Text('Compila tutti i campi.'),
+          )
+      );
+      return;
+    }
+
+    final navigator = Navigator.of(dialogContext);
+
+    setDialogState(()=>_isLoadingDialog=true);
+
+    try{
+      await apiClient.updatePersonalData(surname: newSurname);
+      if(!mounted) return;
+      navigator.pop();
+      setState(()=>widget.activeUser.surname=newSurname);
+    }catch(e){
+      if (!context.mounted) return;
+      ShadToaster.of(context).show(
+        const ShadToast.destructive(
+          title: Text('Errore'),
+          description: Text('Impossibile modificare il cognome.'),
+        ),
+      );
+    }finally{
+      if (mounted) setDialogState(() => _isLoadingDialog = false);
+    }
+  }
+
+  void _showUpdateNamesDialog({required int nameType}){
+    _isLoadingDialog=false;
+
+    nameType==1?_newName1Controller.clear():_newName2Controller.clear();
+
+    showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        barrierDismissible: false, //questo determina se con un tap fuori dal dialog posso chiuderlo
+        builder: (dialogContext) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return Dialog(
+                backgroundColor: const Color(0xFF18181B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Modifica il ${(nameType==1)?'':'secondo'} nome',
+                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.of(dialogContext).pop(),
+                            child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            const Text('Nuovo Nome', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const SizedBox(height: 6),
+                            ShadInput(
+                              controller: (nameType==1)?_newName1Controller:_newName2Controller,
+                              keyboardType: TextInputType.text,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ShadButton.outline(
+                            child: const Text('Annulla'),
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                          ),
+                          const SizedBox(width: 8),
+                          ShadButton(
+                            onPressed:
+                            _isLoadingDialog?null:
+                            (nameType==1)?()=>_updateNames(1, dialogContext, setDialogState):()=>_updateNames(2, dialogContext, setDialogState),
+                            leading:
+                            _isLoadingDialog
+                                ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              ),
+                            )
+                                : null,
+                            child: const Text('Salva'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+        )
+    );
+  }
+
+  void _showUpdateSurnameDialog(){
+    _isLoadingDialog=false;
+
+    _newSurnameController.text.trim();
+
+    showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        barrierDismissible: false, //questo determina se con un tap fuori dal dialog posso chiuderlo
+        builder: (dialogContext) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return Dialog(
+                backgroundColor: const Color(0xFF18181B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Modifica il cognome',
+                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.of(dialogContext).pop(),
+                            child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            const Text('Nuovo Cognome', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const SizedBox(height: 6),
+                            ShadInput(
+                              controller: _newSurnameController,
+                              keyboardType: TextInputType.text,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ShadButton.outline(
+                            child: const Text('Annulla'),
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                          ),
+                          const SizedBox(width: 8),
+                          ShadButton(
+                            onPressed:
+                            _isLoadingDialog?null:()=>_updateSurname(dialogContext, setDialogState),
+                            leading:
+                            _isLoadingDialog
+                                ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              ),
+                            )
+                                : null,
+                            child: const Text('Salva'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+        )
+    );
   }
 
   void _showUpdateEmailDialog(){
@@ -491,7 +777,99 @@ class _SettingsState extends State<Settings>{
                       leading: const Icon(Icons.lock, size: 18),
                       child: const Text('Modifica Password'),
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Divider(
+                    indent: 5,
+                    endIndent: 5,
+                    color: Colors.white54,
+                    thickness: 0.0,
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Center(
+                    child: const Text(
+                      'Informazioni Personali',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Nome: ${widget.activeUser.name1}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      ShadButton(
+                        onPressed: () => _showUpdateNamesDialog(nameType: 1),
+                        child: const Text('Modifica'),
+                      ),
+                    ],
+                  ),
+                  if (widget.activeUser.name2 != null && widget.activeUser.name2!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Secondo Nome: ${widget.activeUser.name2}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ShadButton(
+                          onPressed: () => _showUpdateNamesDialog(nameType: 2),
+                          child: const Text('Modifica'),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Cognome: ${widget.activeUser.surname}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      ShadButton(
+                        onPressed: () => _showUpdateSurnameDialog(),
+                        child: const Text('Modifica'),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

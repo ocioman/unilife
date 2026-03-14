@@ -54,7 +54,7 @@ class _SignupPageState extends State<SignupPage>{
         password: password,
         nome1: nome,
         nome2: secondoNome.isEmpty ? null : secondoNome,
-        cognome1: cognome,
+        cognome: cognome,
       );
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(

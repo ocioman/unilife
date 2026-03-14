@@ -16,7 +16,7 @@ class ApiClient{
   String get _uid=>_supabase.auth.currentUser!.id;
 
   Future<void> signUp({required String email, required String password, required String nome1, String? nome2,
-    required String cognome1, String? cognome2,}) async{
+    required String cognome}) async{
     try{
       await _supabase.auth.signUp(
         email: email,
@@ -24,8 +24,7 @@ class ApiClient{
         data:{
           'first_name': nome1,
           'second_name': nome2,
-          'last_name': cognome1,
-          'second_surname': cognome2,
+          'last_name': cognome,
         },
       );
     }on AuthException{
@@ -108,6 +107,30 @@ class ApiClient{
     }on AuthException{
       rethrow;
     }catch(e){
+      rethrow;
+    }
+  }
+
+  Future<void> updatePersonalData({String? name1, String? name2, String? surname}) async{
+    try{
+      Map<String, dynamic> update;
+
+      if(name1 != null && name1.isNotEmpty) {
+        update = {'name1': name1};
+      }else if(name2!=null && name2.isNotEmpty){
+        update={'name2':name2};
+      }else{
+        update={'surname1':surname};
+      }
+
+      await _supabase
+        .from('users')
+        .update(update)
+        .eq('userID', _uid);
+
+    }on AuthException{
+      rethrow;
+    }catch (e){
       rethrow;
     }
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:unilife/login_page.dart';
 import 'package:unilife/main.dart';
 import 'package:unilife/settings.dart';
@@ -64,7 +65,14 @@ class _HomePageState extends State<HomePage> {
 
   void _onGradeAdded(Grade grade) {
     setState(() => _grades.add(grade));
-    _refreshAverage();
+
+    try {
+      _refreshAverage();
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
   }
 
   void _onGradeUpdated(int gradeID, Grade updatedGrade) {
@@ -76,12 +84,25 @@ class _HomePageState extends State<HomePage> {
       final index = _grades.indexWhere((g) => g.gradeID == gradeID);
       if (index != -1) _grades[index] = updatedGrade;
     });
-    _refreshAverage();
+
+    try {
+      _refreshAverage();
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
   }
 
   void _onGradeDeleted(int gradeID) {
     setState(() => _grades.removeWhere((g) => g.gradeID == gradeID));
-    _refreshAverage();
+    try {
+      _refreshAverage();
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
   }
 
   void _onGradeCompletionChanged(int gradeID, bool isCompleted) {
@@ -89,7 +110,14 @@ class _HomePageState extends State<HomePage> {
       final index = _grades.indexWhere((g) => g.gradeID == gradeID);
       if (index != -1) _grades[index].isCompleted = isCompleted;
     });
-    _refreshAverage();
+
+    try {
+      _refreshAverage();
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
   }
 
   Future<void> _refreshAverage() async {
@@ -97,7 +125,11 @@ class _HomePageState extends State<HomePage> {
       final avg = await apiClient.computeAvg();
       if (!mounted) return;
       setState(() => _average = avg);
-    } catch (_) {}
+    }on PostgrestException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
   }
 
   void _onExamAdded(Exam exam) {

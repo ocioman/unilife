@@ -10,8 +10,7 @@ class UserModel{
   String userID;
   String name1;
   String? name2;
-  String surname1;
-  String? surname2;
+  String surname;
   String email;
   List<Grade>? grades;
   List<Exam>? exams;
@@ -20,8 +19,7 @@ class UserModel{
     required this.userID,
     required this.name1,
     this.name2,
-    required this.surname1,
-    this.surname2,
+    required this.surname,
     required this.email,
     this.grades,
     this.exams,
