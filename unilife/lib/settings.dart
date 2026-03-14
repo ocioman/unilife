@@ -24,7 +24,8 @@ class _SettingsState extends State<Settings>{
   final _newPasswordController=TextEditingController();
   final _newEmailController=TextEditingController();
   bool _isLoadingDialog=false;
-
+  bool _obscurePassword=true;
+  bool _obscureNewPassword=true;
   @override
   void dispose(){
     _passwordController.dispose();
@@ -38,7 +39,7 @@ class _SettingsState extends State<Settings>{
       Navigator.of(context).pop();
   }
 
-  Future<void> _updateEmail(BuildContext dialogContext) async{
+  Future<void> _updateEmail(BuildContext dialogContext, void Function(void Function()) setDialogState) async{
     final String newEmail=_newEmailController.text.trim();
     final String password=_passwordController.text.trim();
 
@@ -49,11 +50,12 @@ class _SettingsState extends State<Settings>{
           description: Text('Compila tutti i campi.'),
         )
       );
+      return;
     }
 
     final navigator = Navigator.of(dialogContext);
 
-    setState(()=>_isLoadingDialog=true);
+    setDialogState(()=>_isLoadingDialog=true);
 
     try{
         await apiClient.updateEmail(
@@ -80,11 +82,11 @@ class _SettingsState extends State<Settings>{
         ),
       );
     }finally{
-      if (mounted) setState(() => _isLoadingDialog = false);
+      if (mounted) setDialogState(() => _isLoadingDialog = false);
     }
   }
 
-  Future<void> _updatePassword(BuildContext dialogContext) async{
+  Future<void> _updatePassword(BuildContext dialogContext, void Function(void Function()) setDialogState) async{
     String? oldPassword=_passwordController.text.trim();
     String? newPassword=_newPasswordController.text.trim();
 
@@ -95,11 +97,12 @@ class _SettingsState extends State<Settings>{
             description: Text('Compila tutti i campi.'),
           )
       );
+      return;
     }
 
     final navigator = Navigator.of(dialogContext);
 
-    setState(()=>_isLoadingDialog=true);
+    setDialogState(()=>_isLoadingDialog=true);
 
     try{
       await apiClient.updatePassword(
@@ -127,8 +130,303 @@ class _SettingsState extends State<Settings>{
     }finally{
       newPassword=null;
       oldPassword=null;
-      if (mounted) setState(() => _isLoadingDialog = false);
+      if (mounted) setDialogState(() => _isLoadingDialog = false);
     }
+  }
+
+  void _showUpdateEmailDialog(){
+    _isLoadingDialog=false;
+    _newEmailController.clear();
+    _passwordController.clear();
+    _obscurePassword=true;
+
+    showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        barrierDismissible: false, //questo determina se con un tap fuori dal dialog posso chiuderlo
+        builder: (dialogContext) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return Dialog(
+                backgroundColor: const Color(0xFF18181B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Modifica Email',
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.of(dialogContext).pop(),
+                            child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            const Text('Nuova Email', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const SizedBox(height: 6),
+                            ShadInput(
+                              controller: _newEmailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Inserisci la tua password per confermare',
+                              style: TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                            const SizedBox(height: 6),
+                            ShadInput(
+                              controller: _passwordController,
+                              padding:  EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                              obscureText: _obscurePassword,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
+                              trailing: ShadIconButton.ghost(
+                                width: 24,
+                                height: 24,
+                                padding: EdgeInsets.zero,
+                                onPressed: ()=>
+                                    setDialogState(()=> _obscurePassword=!_obscurePassword),
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  size: 21,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ShadButton.outline(
+                            child: const Text('Annulla'),
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                          ),
+                          const SizedBox(width: 8),
+                          ShadButton(
+                            onPressed:
+                            _isLoadingDialog?null:()=>_updateEmail(dialogContext, setDialogState),
+                            leading:
+                            _isLoadingDialog
+                                ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              ),
+                            )
+                                : null,
+                            child: const Text('Salva'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+        )
+    );
+  }
+
+  void _showUpdatePasswordDialog(){
+    _isLoadingDialog=false;
+    _passwordController.clear();
+    _newPasswordController.clear();
+    _obscurePassword=true;
+    _obscureNewPassword=true;
+
+    showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        barrierDismissible: false,
+        builder: (dialogContext) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return Dialog(
+                backgroundColor: const Color(0xFF18181B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Modifica Password',
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.of(dialogContext).pop(),
+                            child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            const Text('Password Attuale', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const SizedBox(height: 6),
+                            ShadInput(
+                              controller: _passwordController,
+                              padding: EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                              obscureText: _obscurePassword,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
+                              trailing: ShadIconButton.ghost(
+                                width: 24,
+                                height: 24,
+                                padding: EdgeInsets.zero,
+                                onPressed: ()=>
+                                    setDialogState(()=> _obscurePassword=!_obscurePassword),
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  size: 21,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text('Nuova Password', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const SizedBox(height: 6),
+                            ShadInput(
+                              controller: _newPasswordController,
+                              padding: EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                              obscureText: _obscureNewPassword,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
+                              trailing: ShadIconButton.ghost(
+                                width: 24,
+                                height: 24,
+                                padding: EdgeInsets.zero,
+                                onPressed: ()=>
+                                    setDialogState(()=> _obscureNewPassword=!_obscureNewPassword),
+                                icon: Icon(
+                                  _obscureNewPassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  size: 21,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ShadButton.outline(
+                            child: const Text('Annulla'),
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                          ),
+                          const SizedBox(width: 8),
+                          ShadButton(
+                            onPressed:
+                            _isLoadingDialog?null:()=>_updatePassword(dialogContext, setDialogState),
+                            leading:
+                            _isLoadingDialog
+                                ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              ),
+                            )
+                                : null,
+                            child: const Text('Salva'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+        )
+    );
   }
   
   @override
@@ -146,9 +444,13 @@ class _SettingsState extends State<Settings>{
         elevation: 0,
         leading: Builder(
             builder: (context){
-              return IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: _goBack,
+              return GestureDetector(
+                onTap: _goBack,
+                child: Container(
+                  color: Colors.transparent, // Necessario per prendere i tap ovunque
+                  padding: const EdgeInsets.all(16),
+                  child: const Icon(Icons.arrow_back),
+                ),
               );
             }
         ),
@@ -173,6 +475,23 @@ class _SettingsState extends State<Settings>{
                     SizedBox(
                       height: 30,
                     ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ShadButton(
+                      onPressed: ()=>_showUpdateEmailDialog(),
+                      leading: const Icon(Icons.email, size: 18),
+                      child: const Text('Modifica Email'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ShadButton(
+                      onPressed: ()=>_showUpdatePasswordDialog(),
+                      leading: const Icon(Icons.lock, size: 18),
+                      child: const Text('Modifica Password'),
+                    ),
+                  )
                 ],
               ),
             ),

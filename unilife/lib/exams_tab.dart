@@ -236,6 +236,19 @@ class _ExamsTabState extends State<ExamsTab> {
                               const SizedBox(height: 6),
                               ShadInput(
                                 controller: _courseNameController,
+                                decoration: ShadDecoration(
+                                  border: ShadBorder.all(
+                                    color: const Color(0xFF666666),
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: ShadBorder.all(
+                                    color: Colors.white,
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  disableSecondaryBorder: true,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               const Text(
@@ -444,11 +457,15 @@ class _ExamsTabState extends State<ExamsTab> {
         elevation: 0,
         leading: Builder(
             builder: (context) {
-              return IconButton(
-                  icon: const Icon(Icons.menu_rounded),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  }
+              return GestureDetector(
+                onTap: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.all(16),
+                  child: const Icon(Icons.menu_rounded),
+                ),
               );
             }
         ),

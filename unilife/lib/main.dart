@@ -32,6 +32,13 @@ class MyApp extends StatelessWidget{
         brightness: Brightness.dark,
         colorScheme: const ShadZincColorScheme.dark(),
       ),
+      materialThemeBuilder: (context, theme) {
+        return theme.copyWith(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+        );
+      },
       home: const LoginPage(),
     );
   }

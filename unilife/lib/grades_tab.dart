@@ -409,6 +409,19 @@ class _GradesTabState extends State<GradesTab> {
                             const SizedBox(height: 6),
                             ShadInput(
                               controller: _examNameController,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
                             ),
                             if(grade==null) ...[
                               const SizedBox(height: 16,),
@@ -431,6 +444,19 @@ class _GradesTabState extends State<GradesTab> {
                                 keyboardType: const TextInputType.numberWithOptions(
                                   decimal: true,
                                 ),
+                                decoration: ShadDecoration(
+                                  border: ShadBorder.all(
+                                    color: const Color(0xFF666666),
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: ShadBorder.all(
+                                    color: Colors.white,
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  disableSecondaryBorder: true,
+                                ),
                               ),
                             ],
                             const SizedBox(height: 16),
@@ -442,6 +468,19 @@ class _GradesTabState extends State<GradesTab> {
                             ShadInput(
                               controller: _cfuController,
                               keyboardType: TextInputType.number,
+                              decoration: ShadDecoration(
+                                border: ShadBorder.all(
+                                  color: const Color(0xFF666666),
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                focusedBorder: ShadBorder.all(
+                                  color: Colors.white,
+                                  width: 1.5,
+                                  radius: BorderRadius.circular(8),
+                                ),
+                                disableSecondaryBorder: true,
+                              ),
                             ),
                           ],
                         ),
@@ -657,6 +696,19 @@ class _GradesTabState extends State<GradesTab> {
                               const SizedBox(height: 6),
                               ShadInput(
                                 controller: _partialNameController,
+                                decoration: ShadDecoration(
+                                  border: ShadBorder.all(
+                                    color: const Color(0xFF666666),
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: ShadBorder.all(
+                                    color: Colors.white,
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  disableSecondaryBorder: true,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               const Text(
@@ -669,6 +721,19 @@ class _GradesTabState extends State<GradesTab> {
                                 keyboardType: const TextInputType.numberWithOptions(
                                   decimal: true,
                                 ),
+                                decoration: ShadDecoration(
+                                  border: ShadBorder.all(
+                                    color: const Color(0xFF666666),
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: ShadBorder.all(
+                                    color: Colors.white,
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  disableSecondaryBorder: true,
+                                ),
                               ),
                               const SizedBox(height: 16),
                               const Text(
@@ -680,6 +745,19 @@ class _GradesTabState extends State<GradesTab> {
                                 controller: _partialWeightController,
                                 placeholder: const Text('es. 50 per il 50%'),
                                 keyboardType: TextInputType.number,
+                                decoration: ShadDecoration(
+                                  border: ShadBorder.all(
+                                    color: const Color(0xFF666666),
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  focusedBorder: ShadBorder.all(
+                                    color: Colors.white,
+                                    width: 1.5,
+                                    radius: BorderRadius.circular(8),
+                                  ),
+                                  disableSecondaryBorder: true,
+                                ),
                               ),
                             ],
                           ),
@@ -1179,11 +1257,15 @@ class _GradesTabState extends State<GradesTab> {
         elevation: 0,
         leading: Builder(
             builder: (context) {
-              return IconButton(
-                  icon: const Icon(Icons.menu_rounded),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  }
+              return GestureDetector(
+                onTap: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.all(16),
+                  child: const Icon(Icons.menu_rounded),
+                ),
               );
             }
         ),

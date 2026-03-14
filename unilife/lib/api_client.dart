@@ -69,7 +69,8 @@ class ApiClient{
   Future<void> updateEmail({required String newEmail, required String password}) async{
     try{
       await _supabase.auth.signInWithPassword(
-          password: password
+          email: _supabase.auth.currentUser!.email!,
+          password: password,
       );
 
       await _supabase.auth.updateUser(
@@ -97,6 +98,7 @@ class ApiClient{
   Future<void> updatePassword({required String oldPassword, required String newPassword}) async{
     try{
       await _supabase.auth.signInWithPassword(
+        email: _supabase.auth.currentUser!.email!,
         password: oldPassword,
       );
 

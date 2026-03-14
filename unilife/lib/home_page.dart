@@ -145,12 +145,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _goToSettings({required UserModel activeUser}){
+  Future<void> _goToSettings({required UserModel activeUser}) async{
     if(!mounted) return;
     Navigator.of(context).pop(); //chiudo il drawer sennò rimane glitchato nella transizione
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(builder: (_)=>Settings(activeUser: activeUser)),
     );
+    if(!mounted) return;
+    setState(() {}); //rebuildo la home con l'eventuale email aggiornata
   }
 
   //metodi per il mettere il drawer in tutte le tabs
