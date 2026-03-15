@@ -76,15 +76,6 @@ class ApiClient{
         UserAttributes(email: newEmail),
       );
 
-      await _supabase
-        .from('users')
-        .update(
-          {
-            'email':newEmail,
-          }
-        )
-        .eq('userID', _uid);
-
     }on AuthException{
       rethrow;
     }on PostgrestException{
@@ -120,7 +111,7 @@ class ApiClient{
       }else if(name2!=null && name2.isNotEmpty){
         update={'name2':name2};
       }else{
-        update={'surname1':surname};
+        update={'surname':surname};
       }
 
       await _supabase
@@ -144,10 +135,13 @@ class ApiClient{
               .eq('userID', _uid);
 
       /*
-        Rimosso il for in e la lista, tramite questo return creo un iterable lazy e non eseguo nulla
-        finché gli elementi non vengono richiesti, quando .toList(); viene chiamato, materializza l'iterable lazy e quindi
-        itero su resJson e per ciascun elemento di resJson metto nella nuova lista l'elemento deserializzato, + easy
-        a discapito di un po' di readability
+        Rimosso il for in e la lista, tramite questo return creo un iterable lazy con un'istruzione globale
+        di mapping (in questo caso la deserializzazione) che dice cosa fare su ogni elemento e non la eseguo
+        finché uno o più elementi non vengono richiesti (viene eseguita solo sugli elementi richiesti).
+        Dato che .toList(); itera su tutti gli elementi dell'iterable (e quindi li richiede tutti),
+        ogni elemento di resJson viene messo nella nuova lista deserializzato. + easy
+        a discapito di un po' di readability, se avessi 10000 elementi nella lista e volessi eseguire la deserializzazione
+        solo per i primi 5 sarebbe molto comodo
        */
       return resJson.map((element)=>Exam.fromJson(element)).toList();
 
