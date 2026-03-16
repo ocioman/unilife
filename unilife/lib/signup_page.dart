@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:unilife/model/password_validator.dart';
+import 'model/invalid_email_exception.dart';
 import 'main.dart';
 import 'login_page.dart';
 
@@ -17,8 +19,11 @@ class _SignupPageState extends State<SignupPage>{
   final _cognomeController=TextEditingController();
   final _emailController=TextEditingController();
   final _passwordController=TextEditingController();
+  
   bool _obscurePassword=true;
   bool _isLoading=false;
+  bool _passwordTouched=false;
+  String? _passwordError;
 
   @override
   void dispose() {
@@ -47,6 +52,15 @@ class _SignupPageState extends State<SignupPage>{
       return;
     }
 
+    final passError=PasswordValidator.validatePassword(password);
+    if(passError!=null) {
+      setState((){
+        _passwordTouched=true;
+        _passwordError=passError;
+      });
+      return;
+    }
+
     setState(()=> _isLoading=true);
     try{
       await apiClient.signUp(
@@ -62,6 +76,14 @@ class _SignupPageState extends State<SignupPage>{
           builder: (_)=>const LoginPage(showSuccessToast: true),
         ),
         (route)=>false,
+      );
+    }on InvalidEmailException catch(e){
+      if(!mounted) return;
+      ShadToaster.of(context).show(
+        ShadToast.destructive(
+          title: const Text('Errore'),
+          description: Text(e.message),
+        ),
       );
     }on AuthException catch(e){
       if(!mounted) return;
@@ -205,17 +227,29 @@ class _SignupPageState extends State<SignupPage>{
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _passwordController,
-                        padding:  EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                        padding: const EdgeInsets.only(left: 12, top: 0.75, bottom: 0.75, right: 12),
                         placeholder: const Text('Inserisci la tua password'),
                         obscureText: _obscurePassword,
+                        onChanged:(password){
+                          setState(() {
+                            _passwordTouched=true;
+                            _passwordError=PasswordValidator.validatePassword(password);
+                          });
+                        },
                         decoration: ShadDecoration(
+                          hasError: _passwordError!=null&&_passwordTouched,
+                          errorStyle: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                          ),
                           border: ShadBorder.all(
-                            color: const Color(0xFF666666),
+                            color: (_passwordError!=null&&_passwordTouched)?Colors.red:const Color(0xFF666666),
                             width: 1.5,
                             radius: BorderRadius.circular(8),
                           ),
                           focusedBorder: ShadBorder.all(
-                            color: Colors.white,
+                            color: (_passwordError!=null&&_passwordTouched)?Colors.red:Colors.white,
                             width: 1.5,
                             radius: BorderRadius.circular(8),
                           ),
@@ -225,8 +259,7 @@ class _SignupPageState extends State<SignupPage>{
                           width: 24,
                           height: 24,
                           padding: EdgeInsets.zero,
-                          onPressed:()=>
-                              setState(()=> _obscurePassword=!_obscurePassword),
+                          onPressed: ()=>setState(()=>_obscurePassword=!_obscurePassword),
                           icon: Icon(
                             _obscurePassword
                                 ? Icons.visibility_off_outlined
@@ -236,6 +269,18 @@ class _SignupPageState extends State<SignupPage>{
                           ),
                         ),
                       ),
+                      if (_passwordError!=null&&_passwordTouched)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, left: 4),
+                          child: Text(
+                            _passwordError!,
+                            style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 28),
                       SizedBox(
                         width: double.infinity,

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:unilife/main.dart';
+import 'package:unilife/model/password_validator.dart';
 
+import 'model/invalid_email_exception.dart';
 import 'model/user_model.dart';
 
 class Settings extends StatefulWidget{
@@ -42,6 +44,8 @@ class _SettingsState extends State<Settings>{
   bool _isLoadingDialog=false;
   bool _obscurePassword=true;
   bool _obscureNewPassword=true;
+  bool _newPasswordTouched=false;
+  String? _newPasswordError;
   @override
   void dispose(){
     _passwordController.dispose();
@@ -92,6 +96,14 @@ class _SettingsState extends State<Settings>{
           description: Text('Password errata.'),
         ),
       );
+    }on InvalidEmailException catch(e) {
+      if (!mounted) return;
+      ShadToaster.of(context).show(
+        ShadToast.destructive(
+          title: const Text('Errore'),
+          description: Text(e.message),
+        ),
+      );
     }catch(e){
       if (!context.mounted) return;
       ShadToaster.of(context).show(
@@ -116,6 +128,15 @@ class _SettingsState extends State<Settings>{
             description: Text('Compila tutti i campi.'),
           )
       );
+      return;
+    }
+
+    final passError=PasswordValidator.validatePassword(newPassword);
+    if(passError!=null){
+      setDialogState((){
+        _newPasswordTouched=true;
+        _newPasswordError=passError;
+      });
       return;
     }
 
@@ -453,6 +474,8 @@ class _SettingsState extends State<Settings>{
     _newPasswordController.clear();
     _obscurePassword=true;
     _obscureNewPassword=true;
+    _newPasswordTouched=false;
+    _newPasswordError=null;
 
     showDialog(
         context: context,
@@ -532,16 +555,28 @@ class _SettingsState extends State<Settings>{
                             const SizedBox(height: 6),
                             ShadInput(
                               controller: _newPasswordController,
-                              padding: EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                              padding: const EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
                               obscureText: _obscureNewPassword,
+                              onChanged: (password){
+                                setDialogState((){
+                                  _newPasswordTouched=true;
+                                  _newPasswordError=PasswordValidator.validatePassword(password);
+                                });
+                              },
                               decoration: ShadDecoration(
+                                hasError: _newPasswordError!=null&&_newPasswordTouched,
+                                errorStyle: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                ),
                                 border: ShadBorder.all(
-                                  color: const Color(0xFF666666),
+                                  color: (_newPasswordError!=null&&_newPasswordTouched)?Colors.red:const Color(0xFF666666),
                                   width: 1.5,
                                   radius: BorderRadius.circular(8),
                                 ),
                                 focusedBorder: ShadBorder.all(
-                                  color: Colors.white,
+                                  color: (_newPasswordError!=null&&_newPasswordTouched)?Colors.red:Colors.white,
                                   width: 1.5,
                                   radius: BorderRadius.circular(8),
                                 ),
@@ -562,6 +597,18 @@ class _SettingsState extends State<Settings>{
                                 ),
                               ),
                             ),
+                            if (_newPasswordError!=null&&_newPasswordTouched)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8, left: 4),
+                                child: Text(
+                                  _newPasswordError!,
+                                  style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),

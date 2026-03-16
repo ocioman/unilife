@@ -442,6 +442,66 @@ class _ExamsTabState extends State<ExamsTab> {
     }
   }
 
+  Widget _buildPopUpMenu(BuildContext context, Function edit, Function delete){
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+      ),
+      child: PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert, color: Colors.white70),
+        tooltip: '',
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        color: const Color(0xFF2A2A2A),
+        onSelected: (value) {
+          if (value == 'edit') {
+            edit();
+          } else if (value == 'delete') {
+            delete();
+          }
+        },
+        itemBuilder:
+            (context) => [
+          PopupMenuItem(
+            value: 'edit',
+            child: Row(
+              children: const [
+                Icon(Icons.edit_outlined, color: Colors.white70, size: 20),
+                SizedBox(width: 12),
+                Text(
+                  'Modifica',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: const [
+                Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                SizedBox(width: 12),
+                Text(
+                  'Elimina',
+                  style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -589,37 +649,9 @@ class _ExamsTabState extends State<ExamsTab> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: Colors.white70,
-                          ),
-                          color: const Color(0xFF2A2A2A),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              _showExamDialog(existingExam: exam);
-                            } else if (value == 'delete') {
-                              _deleteExam(exam.examID);
-                            }
-                          },
-                          itemBuilder:
-                              (context) => [
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text(
-                                    'Modifica',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Text(
-                                    'Elimina',
-                                    style: TextStyle(color: Colors.redAccent),
-                                  ),
-                                ),
-                              ],
-                        ),
+                        ...[
+                          _buildPopUpMenu(context, ()=> _showExamDialog(existingExam: exam), ()=> _deleteExam(exam.examID)),
+                        ],
                       ],
                     ),
                   ),

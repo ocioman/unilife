@@ -140,7 +140,7 @@ class _LoginPageState extends State<LoginPage>{
                         /*il trailing dell'icona password alza leggermente il padding dell'input e quindi ho dovuto adattarlo (non so se sia preciso, sui docs di shadcn
                           non ci sono info a riguardo)
                          */
-                        padding:  EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                        padding:  EdgeInsets.only(left: 12, top: 0.75, bottom: 0.75, right: 12),
                         placeholder: const Text('Inserisci la tua password'),
                         obscureText: _obscurePassword,
                         decoration: ShadDecoration(

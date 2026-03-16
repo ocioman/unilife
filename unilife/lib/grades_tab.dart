@@ -977,6 +977,66 @@ class _GradesTabState extends State<GradesTab> {
     );
   }
 
+  Widget _buildPopUpMenu(BuildContext context, Function edit, Function delete){
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+      ),
+      child: PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert, color: Colors.white70),
+        tooltip: '',
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        color: const Color(0xFF2A2A2A),
+        onSelected: (value) {
+          if (value == 'edit') {
+            edit();
+          } else if (value == 'delete') {
+            delete();
+          }
+        },
+        itemBuilder:
+            (context) => [
+          PopupMenuItem(
+            value: 'edit',
+            child: Row(
+              children: const [
+                Icon(Icons.edit_outlined, color: Colors.white70, size: 20),
+                SizedBox(width: 12),
+                Text(
+                  'Modifica',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: const [
+                Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                SizedBox(width: 12),
+                Text(
+                  'Elimina',
+                  style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildParentGradeCard(Grade parent) {
     return Card(
       color: const Color(0xFF232323),
@@ -997,7 +1057,7 @@ class _GradesTabState extends State<GradesTab> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
+              Flexible(
                 child: Text(
                   parent.examName,
                   style: const TextStyle(
@@ -1006,53 +1066,33 @@ class _GradesTabState extends State<GradesTab> {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color:
-                      (parent.isCompleted ?? false)
-                          ? Colors.green.withValues(alpha: 0.2)
-                          : Colors.amber.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  (parent.isCompleted ?? false) ? 'Completato' : 'In corso',
-                  style: TextStyle(
-                    color:
-                        (parent.isCompleted ?? false)
-                            ? Colors.green
-                            : Colors.amber,
-                    fontSize: 12,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color:
+                          (parent.isCompleted ?? false)
+                              ? Colors.green.withValues(alpha: 0.2)
+                              : Colors.amber.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      (parent.isCompleted ?? false) ? 'Completato' : 'In corso',
+                      style: TextStyle(
+                        color:
+                            (parent.isCompleted ?? false)
+                                ? Colors.green
+                                : Colors.amber,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white70),
-                color: const Color(0xFF2A2A2A),
-                onSelected: (value) {
-                  if (value == 'edit') {
-                    _showGradeDialog(grade: parent);
-                  } else if (value == 'delete') {
-                    _deleteGrade(parent.gradeID);
-                  }
-                },
-                itemBuilder:
-                    (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Text(
-                          'Modifica',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text(
-                          'Elimina',
-                          style: TextStyle(color: Colors.redAccent),
-                        ),
-                      ),
-                    ],
+                  ...[
+                    _buildPopUpMenu(context, ()=>_showGradeDialog(grade: parent), ()=>_deleteGrade(parent.gradeID)),
+                  ],
+                ],
               ),
             ],
           ),
@@ -1085,39 +1125,9 @@ class _GradesTabState extends State<GradesTab> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            PopupMenuButton<String>(
-                              icon: const Icon(
-                                Icons.more_vert,
-                                color: Colors.white70,
-                              ),
-                              color: const Color(0xFF2A2A2A),
-                              onSelected: (value) {
-                                if (value == 'edit') {
-                                  _showPartialDialog(partial: p);
-                                } else if (value == 'delete') {
-                                  _deleteGrade(p.gradeID);
-                                }
-                              },
-                              itemBuilder:
-                                  (context) => [
-                                    const PopupMenuItem(
-                                      value: 'edit',
-                                      child: Text(
-                                        'Modifica',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    const PopupMenuItem(
-                                      value: 'delete',
-                                      child: Text(
-                                        'Elimina',
-                                        style: TextStyle(
-                                          color: Colors.redAccent,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                            ),
+                            ...[
+                              _buildPopUpMenu(context, ()=>_showPartialDialog(partial: p), ()=>_deleteGrade(p.gradeID))
+                            ],
                           ],
                         ),
                       ),
@@ -1202,34 +1212,9 @@ class _GradesTabState extends State<GradesTab> {
                 ),
               ),
               const SizedBox(width: 8),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white70),
-                color: const Color(0xFF2A2A2A),
-                onSelected: (value) {
-                  if (value == 'edit') {
-                    _showGradeDialog(grade: grade);
-                  } else if (value == 'delete') {
-                    _deleteGrade(grade.gradeID);
-                  }
-                },
-                itemBuilder:
-                    (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Text(
-                          'Modifica',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text(
-                          'Elimina',
-                          style: TextStyle(color: Colors.redAccent),
-                        ),
-                      ),
-                    ],
-              ),
+              ...[
+                _buildPopUpMenu(context, ()=>_showGradeDialog(grade: grade), ()=>_deleteGrade(grade.gradeID))
+              ],
             ],
           ),
         ),

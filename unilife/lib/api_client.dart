@@ -1,12 +1,12 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:unilife/model/class.dart';
 import 'package:unilife/model/hours_mins.dart';
 import 'package:unilife/model/user_model.dart';
 
+import 'model/invalid_email_exception.dart';
 import 'model/exam.dart';
 import 'model/grade.dart';
-
-//TODO: sicurezza password e correttezza email
 
 class ApiClient{
   final SupabaseClient _supabase;
@@ -18,6 +18,10 @@ class ApiClient{
   Future<void> signUp({required String email, required String password, required String nome1, String? nome2,
     required String cognome}) async{
     try{
+      if(!EmailValidator.validate(email)){
+        throw const InvalidEmailException('Email non valida');
+      }
+
       await _supabase.auth.signUp(
         email: email,
         password: password,
@@ -66,6 +70,9 @@ class ApiClient{
   }
 
   Future<void> updateEmail({required String newEmail, required String password}) async{
+    if(!EmailValidator.validate(newEmail)){
+      throw const InvalidEmailException('Email non valida');
+    }
     try{
       await _supabase.auth.signInWithPassword(
           email: _supabase.auth.currentUser!.email!,
