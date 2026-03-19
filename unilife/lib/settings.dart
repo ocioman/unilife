@@ -264,7 +264,7 @@ class _SettingsState extends State<Settings>{
                             const SizedBox(height: 16),
                             Text(
                                 'Nuovo ${(type.value=='name1' || type.value=='name2')?'Nome':'Cognome'}',
-                                style: const TextStyle(color: Colors.white, fontSize: 13)
+                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)
                             ),
                             const SizedBox(height: 6),
                             ShadInput(
@@ -293,7 +293,7 @@ class _SettingsState extends State<Settings>{
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ShadButton.outline(
-                            child: const Text('Annulla'),
+                            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () => Navigator.of(dialogContext).pop(),
                           ),
                           const SizedBox(width: 8),
@@ -314,7 +314,7 @@ class _SettingsState extends State<Settings>{
                               ),
                             )
                                 : null,
-                            child: const Text('Salva'),
+                            child: const Text('Salva', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -372,7 +372,7 @@ class _SettingsState extends State<Settings>{
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 16),
-                            const Text('Nuova Email', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const Text('Nuova Email', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 6),
                             ShadInput(
                               controller: _newEmailController,
@@ -394,7 +394,7 @@ class _SettingsState extends State<Settings>{
                             const SizedBox(height: 16),
                             const Text(
                               'Inserisci la tua password per confermare',
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 6),
                             ShadInput(
@@ -437,7 +437,7 @@ class _SettingsState extends State<Settings>{
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ShadButton.outline(
-                            child: const Text('Annulla'),
+                            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () => Navigator.of(dialogContext).pop(),
                           ),
                           const SizedBox(width: 8),
@@ -455,7 +455,7 @@ class _SettingsState extends State<Settings>{
                               ),
                             )
                                 : null,
-                            child: const Text('Salva'),
+                            child: const Text('Salva', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -516,7 +516,7 @@ class _SettingsState extends State<Settings>{
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 16),
-                            const Text('Password Attuale', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const Text('Password Attuale', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 6),
                             ShadInput(
                               controller: _passwordController,
@@ -551,7 +551,7 @@ class _SettingsState extends State<Settings>{
                               ),
                             ),
                             const SizedBox(height: 16),
-                            const Text('Nuova Password', style: TextStyle(color: Colors.white, fontSize: 13)),
+                            const Text('Nuova Password', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 6),
                             ShadInput(
                               controller: _newPasswordController,
@@ -617,7 +617,7 @@ class _SettingsState extends State<Settings>{
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ShadButton.outline(
-                            child: const Text('Annulla'),
+                            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () => Navigator.of(dialogContext).pop(),
                           ),
                           const SizedBox(width: 8),
@@ -635,7 +635,7 @@ class _SettingsState extends State<Settings>{
                               ),
                             )
                                 : null,
-                            child: const Text('Salva'),
+                            child: const Text('Salva', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -681,34 +681,93 @@ class _SettingsState extends State<Settings>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                    Center(
-                      child: const Text(
-                          'Sicurezza Account',
-                          style: TextStyle(
+                  Center(
+                    child: const Text(
+                      'Informazioni Personali',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Nome:  ${widget.activeUser.name1}',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ShadButton(
-                      onPressed: ()=>_showUpdateEmailDialog(),
-                      leading: const Icon(Icons.email, size: 18),
-                      child: const Text('Modifica Email'),
+                        ),
+                        ShadButton(
+                          onPressed: () => _showUpdatePersonalDataDialog(type: PersonalDataType.name1),
+                          child: const Text('Modifica', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
                   ),
+                  if (widget.activeUser.name2 != null && widget.activeUser.name2!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Secondo Nome:  ${widget.activeUser.name2}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          ShadButton(
+                            onPressed: () => _showUpdatePersonalDataDialog(type: PersonalDataType.name2),
+                            child: const Text('Modifica', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
-                    child: ShadButton(
-                      onPressed: ()=>_showUpdatePasswordDialog(),
-                      leading: const Icon(Icons.lock, size: 18),
-                      child: const Text('Modifica Password'),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Cognome:  ${widget.activeUser.surname}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ShadButton(
+                          onPressed: () => _showUpdatePersonalDataDialog(type: PersonalDataType.surname),
+                          child: const Text('Modifica', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(
@@ -725,7 +784,7 @@ class _SettingsState extends State<Settings>{
                   ),
                   Center(
                     child: const Text(
-                      'Informazioni Personali',
+                      'Sicurezza Account',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -736,72 +795,50 @@ class _SettingsState extends State<Settings>{
                   SizedBox(
                     height: 30,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Nome:  ${widget.activeUser.name1}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      ShadButton(
-                        onPressed: () => _showUpdatePersonalDataDialog(type: PersonalDataType.name1),
-                        child: const Text('Modifica'),
-                      ),
-                    ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: ShadButton(
+                      onPressed: ()=>_showUpdateEmailDialog(),
+                      leading: const Icon(Icons.email, size: 18),
+                      child: const Text('Modifica Email', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                  if (widget.activeUser.name2 != null && widget.activeUser.name2!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Secondo Nome:  ${widget.activeUser.name2}',
-                            style: const TextStyle(
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ShadButton(
+                      onPressed: ()=>_showUpdatePasswordDialog(),
+                      leading: const Icon(Icons.lock, size: 18),
+                      child: const Text('Modifica Password', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ShadButton(
+                      onPressed: () => 0,
+                      backgroundColor: const Color(0xFFED4337),
+                      hoverBackgroundColor: const Color(0xFFC0392B),
+                      pressedBackgroundColor: const Color(0xFFC0392B),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.delete_outline, size: 20, color: Colors.white,),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "Elimina Account",
+                            style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        ShadButton(
-                          onPressed: () => _showUpdatePersonalDataDialog(type: PersonalDataType.name2),
-                          child: const Text('Modifica'),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Cognome:  ${widget.activeUser.surname}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      ShadButton(
-                        onPressed: () => _showUpdatePersonalDataDialog(type: PersonalDataType.surname),
-                        child: const Text('Modifica'),
-                      ),
-                    ],
+                  ),
+                  SizedBox(
+                    height: 15,
                   ),
                 ],
               ),

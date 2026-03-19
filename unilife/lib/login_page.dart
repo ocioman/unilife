@@ -27,8 +27,8 @@ class _LoginPageState extends State<LoginPage>{
       WidgetsBinding.instance.addPostFrameCallback((_){
         ShadToaster.of(context).show(
           ShadToast(
-            title: const Text('Registrazione avvenuta con successo'),
-            description: const Text('Accedi con le tue credenziali'),
+            title: const Text('Registrazione avvenuta con successo', style: TextStyle(fontWeight: FontWeight.bold)),
+            description: const Text('Accedi con le tue credenziali', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         );
       });
@@ -110,7 +110,7 @@ class _LoginPageState extends State<LoginPage>{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text('Email',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _emailController,
@@ -133,7 +133,7 @@ class _LoginPageState extends State<LoginPage>{
                       const SizedBox(height: 16),
                       // Password
                       const Text('Password',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _passwordController,
@@ -184,7 +184,7 @@ class _LoginPageState extends State<LoginPage>{
                                       strokeWidth: 2, color: Colors.black),
                                 )
                               : const Icon(Icons.person_outline, size: 18),
-                          child: const Text('Login'),
+                          child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                       const SizedBox(height: 16),

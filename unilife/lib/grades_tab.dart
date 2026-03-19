@@ -290,25 +290,25 @@ class _GradesTabState extends State<GradesTab> {
             backgroundColor: const Color(0xFF2A2A2A),
             title: const Text(
               'Elimina Voto',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             content: const Text(
               'Sei sicuro di voler eliminare questo voto?',
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
                 child: const Text(
                   'Annulla',
-                  style: TextStyle(color: Colors.white54),
+                  style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 child: const Text(
                   'Elimina',
-                  style: TextStyle(color: Colors.redAccent),
+                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -394,7 +394,7 @@ class _GradesTabState extends State<GradesTab> {
                       const SizedBox(height: 4),
                       Text(
                         grade==null?'Inserisci i dati dell\'esame.':'Modifica i dati dell\'esame',
-                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       SingleChildScrollView(
                         child: Column(
@@ -404,7 +404,7 @@ class _GradesTabState extends State<GradesTab> {
                             const SizedBox(height: 16),
                             const Text(
                               'Nome Esame',
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 6),
                             ShadInput(
@@ -436,7 +436,7 @@ class _GradesTabState extends State<GradesTab> {
                               const SizedBox(height: 16),
                               const Text(
                                 'Voto (in trentesimi)',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               ShadInput(
@@ -462,7 +462,7 @@ class _GradesTabState extends State<GradesTab> {
                             const SizedBox(height: 16),
                             const Text(
                               'CFU',
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 6),
                             ShadInput(
@@ -490,7 +490,7 @@ class _GradesTabState extends State<GradesTab> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ShadButton.outline(
-                            child: const Text('Annulla'),
+                            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () => Navigator.of(dialogContext).pop(),
                           ),
                           const SizedBox(width: 8),
@@ -510,7 +510,7 @@ class _GradesTabState extends State<GradesTab> {
                                       ),
                                     )
                                     : null,
-                            child: const Text('Salva'),
+                            child: const Text('Salva', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -678,7 +678,7 @@ class _GradesTabState extends State<GradesTab> {
                       const SizedBox(height: 4),
                       Text(
                         partial==null?'Modifica i dati del parziale.':'Inserisci i dati del parziale',
-                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 320),
@@ -691,7 +691,7 @@ class _GradesTabState extends State<GradesTab> {
 
                               const Text(
                                 'Nome Parziale',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               ShadInput(
@@ -713,7 +713,7 @@ class _GradesTabState extends State<GradesTab> {
                               const SizedBox(height: 16),
                               const Text(
                                 'Voto',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               ShadInput(
@@ -738,7 +738,7 @@ class _GradesTabState extends State<GradesTab> {
                               const SizedBox(height: 16),
                               const Text(
                                 'Peso (%)',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               ShadInput(
@@ -768,7 +768,7 @@ class _GradesTabState extends State<GradesTab> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ShadButton.outline(
-                            child: const Text('Annulla'),
+                            child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
                             onPressed: () => Navigator.of(dialogContext).pop(),
                           ),
                           const SizedBox(width: 8),
@@ -788,7 +788,7 @@ class _GradesTabState extends State<GradesTab> {
                                       ),
                                     )
                                     : null,
-                            child: const Text('Salva'),
+                            child: const Text('Salva', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),

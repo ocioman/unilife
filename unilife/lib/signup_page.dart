@@ -134,7 +134,7 @@ class _SignupPageState extends State<SignupPage>{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text('Nome',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _nomeController,
@@ -156,7 +156,7 @@ class _SignupPageState extends State<SignupPage>{
                       ),
                       const SizedBox(height: 16),
                       const Text('Secondo nome (opzionale)',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _secondoNomeController,
@@ -178,7 +178,7 @@ class _SignupPageState extends State<SignupPage>{
                       ),
                       const SizedBox(height: 16),
                       const Text('Cognome',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _cognomeController,
@@ -201,7 +201,7 @@ class _SignupPageState extends State<SignupPage>{
                       const SizedBox(height: 16),
                       // Email
                       const Text('Email',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _emailController,
@@ -223,7 +223,7 @@ class _SignupPageState extends State<SignupPage>{
                       ),
                       const SizedBox(height: 16),
                       const Text('Password',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       ShadInput(
                         controller: _passwordController,
@@ -294,7 +294,7 @@ class _SignupPageState extends State<SignupPage>{
                                       strokeWidth: 2, color: Colors.black),
                                 )
                               : const Icon(Icons.person_add_outlined, size: 18),
-                          child: const Text('Registrati'),
+                          child: const Text('Registrati', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                       const SizedBox(height: 16),

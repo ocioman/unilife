@@ -31,6 +31,11 @@ class MyApp extends StatelessWidget{
       theme: ShadThemeData(
         brightness: Brightness.dark,
         colorScheme: const ShadZincColorScheme.dark(),
+        destructiveToastTheme: const ShadToastTheme(
+          backgroundColor: Color(0xFFED4337),
+          titleStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          descriptionStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
       materialThemeBuilder: (context, theme) {
         return theme.copyWith(

@@ -92,25 +92,25 @@ class _ExamsTabState extends State<ExamsTab> {
             backgroundColor: const Color(0xFF2A2A2A),
             title: const Text(
               'Elimina Esame',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             content: const Text(
               'Sei sicuro di voler eliminare questo esame?',
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
                 child: const Text(
                   'Annulla',
-                  style: TextStyle(color: Colors.white54),
+                  style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 child: const Text(
                   'Elimina',
-                  style: TextStyle(color: Colors.redAccent),
+                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -221,7 +221,7 @@ class _ExamsTabState extends State<ExamsTab> {
                         const SizedBox(height: 4),
                         const Text(
                           'Inserisci i dettagli del prossimo esame.',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                         SingleChildScrollView(
                           child: Column(
@@ -231,7 +231,7 @@ class _ExamsTabState extends State<ExamsTab> {
                               const SizedBox(height: 16),
                               const Text(
                                 'Nome Corso',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               ShadInput(
@@ -253,7 +253,7 @@ class _ExamsTabState extends State<ExamsTab> {
                               const SizedBox(height: 16),
                               const Text(
                                 'Data',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               GestureDetector(
@@ -316,7 +316,7 @@ class _ExamsTabState extends State<ExamsTab> {
                               const SizedBox(height: 16,),
                               const Text(
                                 'Ora',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6,),
                               GestureDetector(
@@ -356,7 +356,7 @@ class _ExamsTabState extends State<ExamsTab> {
                               const SizedBox(height: 16),
                               const Text(
                                 'Priorità',
-                                style: TextStyle(color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 6),
                               ShadSelect<Priority>(
@@ -398,7 +398,7 @@ class _ExamsTabState extends State<ExamsTab> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ShadButton.outline(
-                              child: const Text('Annulla'),
+                              child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
                               onPressed: () => Navigator.of(dialogContext).pop(),
                             ),
                             const SizedBox(width: 8),
@@ -418,7 +418,7 @@ class _ExamsTabState extends State<ExamsTab> {
                                         ),
                                       )
                                       : null,
-                              child: const Text('Salva'),
+                              child: const Text('Salva', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
