@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:unilife/main.dart';
 import 'package:unilife/model/password_validator.dart';
 
+import 'login_page.dart';
 import 'model/invalid_email_exception.dart';
 import 'model/user_model.dart';
 
@@ -176,7 +177,7 @@ class _SettingsState extends State<Settings>{
 
   Future<void> _updatePersonalData(PersonalDataType type, BuildContext dialogContext, void Function(void Function()) setDialogState) async{
 
-    String newPersonalData=(type.value=='name1')?_newName1Controller.text.trim():
+    String? newPersonalData=(type.value=='name1')?_newName1Controller.text.trim():
     (type.value=='name2')?_newName2Controller.text.trim():_newSurnameController.text.trim();
 
     if(newPersonalData.isEmpty){
@@ -214,6 +215,50 @@ class _SettingsState extends State<Settings>{
       );
     }finally{
       if (mounted) setDialogState(() => _isLoadingDialog = false);
+    }
+  }
+
+  Future<void> _deleteAccount(void Function(void Function()) setDialogState) async{
+    String? password=_passwordController.text.trim();
+
+    if(password.isEmpty){
+      if(!context.mounted) return;
+      ShadToaster.of(context).show(
+        ShadToast.destructive(
+          title: const Text('Errore'),
+          description: const Text('Compila tutti i campi.'),
+        ),
+      );
+      return;
+    }
+
+    setDialogState(()=>_isLoadingDialog=true);
+
+    try{
+      await apiClient.deleteAccount(password: password);
+      if(!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_)=>const LoginPage()),
+      );
+    }on AuthException{
+      if(!context.mounted) return;
+      ShadToaster.of(context).show(
+        ShadToast.destructive(
+          title: const Text('Errore'),
+          description: const Text('Password Errata.'),
+        )
+      );
+    }catch (e){
+      if(!context.mounted) return;
+      ShadToaster.of(context).show(
+          ShadToast.destructive(
+            title: const Text('Errore'),
+            description: const Text('Impossibile eliminare l\'account'),
+          )
+      );
+    }finally{
+      if(mounted) setDialogState(()=>_isLoadingDialog=false);
+      password=null;
     }
   }
 
@@ -647,6 +692,120 @@ class _SettingsState extends State<Settings>{
         )
     );
   }
+
+  void _showDeleteAccountDialog(){
+    _isLoadingDialog=false;
+    _passwordController.clear();
+    showDialog(
+        context: context,
+        barrierColor: Colors.black54,
+        barrierDismissible: false,
+        builder: (dialogContext)=>StatefulBuilder(
+          builder: (context, setDialogState){
+            return Dialog(
+              backgroundColor: const Color(0xFF18181B),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Eliminazione Account',
+                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4,),
+                    SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16),
+                          const Text('Inserisci la tua password per confermare (L\'AZIONE NON È REVERSIBILE)', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 6),
+                          ShadInput(
+                            controller: _passwordController,
+                            padding:  EdgeInsets.only(left: 12, top: 2, bottom: 2, right: 12),
+                            obscureText: _obscurePassword,
+                            decoration: ShadDecoration(
+                              border: ShadBorder.all(
+                                color: const Color(0xFF666666),
+                                width: 1.5,
+                                radius: BorderRadius.circular(8),
+                              ),
+                              focusedBorder: ShadBorder.all(
+                                color: Colors.white,
+                                width: 1.5,
+                                radius: BorderRadius.circular(8),
+                              ),
+                              disableSecondaryBorder: true,
+                            ),
+                            trailing: ShadIconButton.ghost(
+                              width: 24,
+                              height: 24,
+                              padding: EdgeInsets.zero,
+                              onPressed: ()=>
+                                  setDialogState(()=> _obscurePassword=!_obscurePassword),
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                size: 21,
+                                color: Colors.white54,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ShadButton(
+                          child: const Text('Annulla', style: TextStyle(fontWeight: FontWeight.bold)),
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                        ),
+                        const SizedBox(width: 8),
+                        ShadButton.outline(
+                          onPressed:
+                            _isLoadingDialog?null:()=>_deleteAccount(setDialogState),
+                            leading:
+                            _isLoadingDialog
+                                ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : null,
+                          backgroundColor: const Color(0xFFED4337),
+                          hoverBackgroundColor: const Color(0xFFC0392B),
+                          pressedBackgroundColor: const Color(0xFFC0392B),
+                          child: const Text('Elimina', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        ),
+    );
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -818,7 +977,7 @@ class _SettingsState extends State<Settings>{
                   SizedBox(
                     width: double.infinity,
                     child: ShadButton(
-                      onPressed: () => 0,
+                      onPressed: () => _showDeleteAccountDialog(),
                       backgroundColor: const Color(0xFFED4337),
                       hoverBackgroundColor: const Color(0xFFC0392B),
                       pressedBackgroundColor: const Color(0xFFC0392B),

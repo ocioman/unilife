@@ -69,6 +69,25 @@ class ApiClient{
     }
   }
 
+  Future<void> deleteAccount({required String password}) async{
+    try{
+      await _supabase.auth.signInWithPassword(
+          email: _supabase.auth.currentUser!.email,
+          password: password
+      );
+
+      await _supabase
+        .from('users')
+        .delete()
+        .eq('userID', _uid);
+
+    }on AuthException{
+      rethrow;
+    }catch(e){
+      rethrow;
+    }
+  }
+
   Future<void> updateEmail({required String newEmail, required String password}) async{
     if(!EmailValidator.validate(newEmail)){
       throw const InvalidEmailException('Email non valida');
